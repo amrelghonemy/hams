@@ -1,13 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
-import { usePathname } from "next/navigation";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { locale } = useLanguage();
   const pathname = usePathname();
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    if (pathname === "/admin/login") {
+      setAuthorized(true);
+      setChecking(false);
+      return;
+    }
+    fetch("/api/admin/stats")
+      .then((r) => {
+        if (r.ok) {
+          setAuthorized(true);
+        } else {
+          router.replace("/admin/login");
+        }
+      })
+      .catch(() => router.replace("/admin/login"))
+      .finally(() => setChecking(false));
+  }, [pathname, router]);
+
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-cream-100 flex items-center justify-center">
+        <div className="text-charcoal-400 text-sm">...</div>
+      </div>
+    );
+  }
+
+  if (!authorized) return null;
 
   const navItems = [
     { href: "/admin", label: locale === "ar" ? "لوحة التحكم" : "Dashboard", icon: "📊" },
@@ -28,19 +63,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <header className="bg-white/80 backdrop-blur-md border-b border-cream-300 px-6 py-4 shadow-soft">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-xl font-display font-bold text-charcoal-700">
+            <Link href="/" className="text-xl font-bold text-charcoal-700" style={{ fontFamily: "var(--font-cairo)" }}>
               HAMS <span className="font-light text-blush-300">STYLE</span>
             </Link>
             <span className="text-[10px] bg-blush-400 text-white px-3 py-1 font-bold tracking-wider rounded-full">
               ADMIN
             </span>
           </div>
-          <Link
-            href="/"
-            className="text-sm text-charcoal-400 hover:text-blush-400 transition-colors"
-          >
-            {locale === "ar" ? "عرض الموقع" : "View Site"} →
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-sm text-charcoal-400 hover:text-blush-400 transition-colors"
+            >
+              {locale === "ar" ? "عرض الموقع" : "View Site"} →
+            </Link>
+            <button
+              onClick={() => {
+                document.cookie = "hams-token=; path=/; max-age=0";
+                router.push("/admin/login");
+              }}
+              className="text-sm text-charcoal-400 hover:text-red-400 transition-colors"
+            >
+              {locale === "ar" ? "خروج" : "Logout"}
+            </button>
+          </div>
         </div>
       </header>
       <div className="flex">

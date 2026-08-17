@@ -11,19 +11,23 @@ export default function AdminProductEditPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<any>({});
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/products/${params.id}`)
+    fetch(`/api/admin/products`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.product) {
-          const p = data.product;
+        const p = (data.products || []).find((x: any) => String(x.id) === String(params.id));
+        if (p) {
+          const parsedImages = typeof p.images === "string" ? JSON.parse(p.images || "[]") : (p.images || []);
           setForm({
             ...p,
-            sizes: JSON.parse(p.sizes || "[]").join(", "),
-            colors: JSON.parse(p.colors || "[]").join(", "),
-            images: JSON.parse(p.images || "[]").join("\n"),
+            sizes: Array.isArray(p.sizes) ? p.sizes.join(", ") : JSON.parse(p.sizes || "[]").join(", "),
+            colors: Array.isArray(p.colors) ? p.colors.join(", ") : JSON.parse(p.colors || "[]").join(", "),
+            images: "",
           });
+          setImageUrls(parsedImages);
         }
         setLoading(false);
       });
@@ -34,16 +38,18 @@ export default function AdminProductEditPage() {
     setSaving(true);
     try {
       await fetch(`/api/admin/products`, {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
+          id: form.id,
+          name_en: form.name_en,
+          name_ar: form.name_ar,
           price: parseFloat(form.price),
           sale_price: form.sale_price ? parseFloat(form.sale_price) : null,
           stock: parseInt(form.stock) || 0,
           sizes: JSON.stringify(form.sizes.split(",").map((s: string) => s.trim())),
           colors: JSON.stringify(form.colors.split(",").map((c: string) => c.trim())),
-          images: JSON.stringify(form.images.split("\n").filter((u: string) => u.trim())),
+          images: JSON.stringify([...imageUrls, ...form.images.split("\n").filter((u: string) => u.trim())]),
         }),
       });
       router.push("/admin/products");
@@ -140,11 +146,59 @@ export default function AdminProductEditPage() {
             />
           </div>
           <div>
-            <label className="label-text">Images (URLs, one per line)</label>
+            <label className="label-text">
+              {locale === "ar" ? "رفع صور" : "Upload Images"}
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="input-field file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blush-400 file:text-white file:text-sm file:cursor-pointer file:font-medium"
+              onChange={async (e) => {
+                const files = e.target.files;
+                if (!files) return;
+                setUploading(true);
+                for (const file of Array.from(files)) {
+                  const fd = new FormData();
+                  fd.append("file", file);
+                  try {
+                    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+                    const data = await res.json();
+                    if (data.url) setImageUrls((prev) => [...prev, data.url]);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }
+                setUploading(false);
+              }}
+            />
+            {uploading && <p className="text-xs text-charcoal-400 mt-2">{locale === "ar" ? "جاري الرفع..." : "Uploading..."}</p>}
+            {imageUrls.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {imageUrls.map((url, i) => (
+                  <div key={i} className="relative group">
+                    <img src={url} alt="" className="w-20 h-20 object-cover rounded-xl border border-cream-300" />
+                    <button
+                      type="button"
+                      onClick={() => setImageUrls((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="label-text">
+              {locale === "ar" ? "روابط صور إضافية" : "Additional Image URLs"} ({locale === "ar" ? "رابط لكل سطر" : "one per line"})
+            </label>
             <textarea
-              className="input-field h-32 font-mono text-xs resize-none"
+              className="input-field h-24 font-mono text-xs resize-none"
               value={form.images || ""}
               onChange={(e) => setForm({ ...form, images: e.target.value })}
+              placeholder="https://..."
             />
           </div>
         </div>

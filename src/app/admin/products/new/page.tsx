@@ -27,6 +27,8 @@ export default function AdminProductFormPage() {
     is_bestseller: false,
     is_active: true,
   });
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/categories")
@@ -49,7 +51,7 @@ export default function AdminProductFormPage() {
           stock: parseInt(form.stock) || 0,
           sizes: JSON.stringify(form.sizes.split(",").map((s) => s.trim())),
           colors: JSON.stringify(form.colors.split(",").map((c) => c.trim())),
-          images: JSON.stringify(form.images.split("\n").filter((u) => u.trim())),
+          images: JSON.stringify([...imageUrls, ...form.images.split("\n").filter((u) => u.trim())]),
           is_new: form.is_new ? 1 : 0,
           is_bestseller: form.is_bestseller ? 1 : 0,
           is_active: form.is_active ? 1 : 0,
@@ -209,10 +211,55 @@ export default function AdminProductFormPage() {
           </div>
           <div>
             <label className="label-text">
-              {locale === "ar" ? "روابط الصور" : "Image URLs"} (one per line)
+              {locale === "ar" ? "رفع صور" : "Upload Images"}
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="input-field file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blush-400 file:text-white file:text-sm file:cursor-pointer file:font-medium"
+              onChange={async (e) => {
+                const files = e.target.files;
+                if (!files) return;
+                setUploading(true);
+                for (const file of Array.from(files)) {
+                  const fd = new FormData();
+                  fd.append("file", file);
+                  try {
+                    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+                    const data = await res.json();
+                    if (data.url) setImageUrls((prev) => [...prev, data.url]);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }
+                setUploading(false);
+              }}
+            />
+            {uploading && <p className="text-xs text-charcoal-400 mt-2">{locale === "ar" ? "جاري الرفع..." : "Uploading..."}</p>}
+            {imageUrls.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {imageUrls.map((url, i) => (
+                  <div key={i} className="relative group">
+                    <img src={url} alt="" className="w-20 h-20 object-cover rounded-xl border border-cream-300" />
+                    <button
+                      type="button"
+                      onClick={() => setImageUrls((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="label-text">
+              {locale === "ar" ? "روابط صور إضافية" : "Image URLs"} ({locale === "ar" ? "رابط لكل سطر" : "one per line"})
             </label>
             <textarea
-              className="input-field h-32 font-mono text-xs resize-none"
+              className="input-field h-24 font-mono text-xs resize-none"
               value={form.images}
               onChange={(e) => setForm({ ...form, images: e.target.value })}
               placeholder="https://..."
