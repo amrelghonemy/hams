@@ -59,7 +59,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-block">
-              <img src="/logo.png" alt="Hams Style" className="h-10 w-auto object-contain" />
+              <img src="/logo.png" alt="Hams Style" className="h-14 w-auto object-contain" />
             </Link>
             <p className="text-charcoal-400 text-sm mt-4 leading-relaxed">
               {locale === "ar"

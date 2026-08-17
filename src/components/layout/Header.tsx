@@ -98,7 +98,7 @@ export function Header() {
               <img
                 src="/logo.png"
                 alt="Hams Style"
-                className="h-10 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                className="h-14 md:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
 
@@ -213,7 +213,7 @@ export function Header() {
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <img src="/logo.png" alt="Hams Style" className="h-10 w-auto object-contain" />
+                <img src="/logo.png" alt="Hams Style" className="h-14 w-auto object-contain" />
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}

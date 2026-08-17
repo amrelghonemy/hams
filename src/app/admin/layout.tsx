@@ -64,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center">
-              <img src="/logo.png" alt="Hams Style" className="h-8 w-auto object-contain" />
+              <img src="/logo.png" alt="Hams Style" className="h-12 w-auto object-contain" />
             </Link>
             <span className="text-[10px] bg-blush-400 text-white px-3 py-1 font-bold tracking-wider rounded-full">
               ADMIN
