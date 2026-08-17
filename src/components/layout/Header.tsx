@@ -94,13 +94,12 @@ export function Header() {
               </svg>
             </button>
 
-            <Link href="/" className="flex items-center gap-1.5 group">
-              <span className="text-xl md:text-2xl font-display font-bold tracking-tight text-charcoal-800 transition-colors duration-300 group-hover:text-charcoal-900">
-                HAMS
-              </span>
-              <span className="text-xl md:text-2xl font-display font-light tracking-tight text-rose-400 transition-colors duration-300 group-hover:text-rose-500">
-                STYLE
-              </span>
+            <Link href="/" className="flex items-center group">
+              <img
+                src="/logo.png"
+                alt="Hams Style"
+                className="h-10 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">
@@ -212,11 +211,9 @@ export function Header() {
             <div className="flex items-center justify-between p-6 border-b border-rose-100/60">
               <Link
                 href="/"
-                className="text-lg font-display"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <span className="font-bold text-charcoal-800">HAMS</span>
-                <span className="font-light text-rose-400"> STYLE</span>
+                <img src="/logo.png" alt="Hams Style" className="h-10 w-auto object-contain" />
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}

@@ -58,9 +58,8 @@ export function Footer() {
       <div className="container-custom py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="text-xl font-display">
-              <span className="font-bold text-charcoal-800">HAMS</span>
-              <span className="font-light text-rose-400"> STYLE</span>
+            <Link href="/" className="inline-block">
+              <img src="/logo.png" alt="Hams Style" className="h-10 w-auto object-contain" />
             </Link>
             <p className="text-charcoal-400 text-sm mt-4 leading-relaxed">
               {locale === "ar"

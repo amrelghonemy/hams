@@ -24,6 +24,10 @@ export const metadata: Metadata = {
     "تسوق اونلاين",
   ],
   authors: [{ name: "Hams Style" }],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     type: "website",
     locale: "ar_EG",

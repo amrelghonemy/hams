@@ -63,8 +63,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <header className="bg-white/80 backdrop-blur-md border-b border-cream-300 px-6 py-4 shadow-soft">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-xl font-bold text-charcoal-700" style={{ fontFamily: "var(--font-cairo)" }}>
-              HAMS <span className="font-light text-blush-300">STYLE</span>
+            <Link href="/" className="flex items-center">
+              <img src="/logo.png" alt="Hams Style" className="h-8 w-auto object-contain" />
             </Link>
             <span className="text-[10px] bg-blush-400 text-white px-3 py-1 font-bold tracking-wider rounded-full">
               ADMIN
