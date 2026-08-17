@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { SizeSelector } from "@/components/admin/SizeSelector";
 
 export default function AdminProductEditPage() {
   const params = useParams();
@@ -12,6 +13,7 @@ export default function AdminProductEditPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<any>({});
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -21,12 +23,14 @@ export default function AdminProductEditPage() {
         const p = (data.products || []).find((x: any) => String(x.id) === String(params.id));
         if (p) {
           const parsedImages = typeof p.images === "string" ? JSON.parse(p.images || "[]") : (p.images || []);
+          const parsedSizes = typeof p.sizes === "string" ? JSON.parse(p.sizes || "[]") : (p.sizes || []);
           setForm({
             ...p,
-            sizes: Array.isArray(p.sizes) ? p.sizes.join(", ") : JSON.parse(p.sizes || "[]").join(", "),
+            sizes: "",
             colors: Array.isArray(p.colors) ? p.colors.join(", ") : JSON.parse(p.colors || "[]").join(", "),
             images: "",
           });
+          setSelectedSizes(parsedSizes);
           setImageUrls(parsedImages);
         }
         setLoading(false);
@@ -47,7 +51,7 @@ export default function AdminProductEditPage() {
           price: parseFloat(form.price),
           sale_price: form.sale_price ? parseFloat(form.sale_price) : null,
           stock: parseInt(form.stock) || 0,
-          sizes: JSON.stringify(form.sizes.split(",").map((s: string) => s.trim())),
+          sizes: JSON.stringify(selectedSizes),
           colors: JSON.stringify(form.colors.split(",").map((c: string) => c.trim())),
           images: JSON.stringify([...imageUrls, ...form.images.split("\n").filter((u: string) => u.trim())]),
         }),
@@ -129,14 +133,11 @@ export default function AdminProductEditPage() {
               />
             </div>
           </div>
-          <div>
-            <label className="label-text">Sizes</label>
-            <input
-              className="input-field"
-              value={form.sizes || ""}
-              onChange={(e) => setForm({ ...form, sizes: e.target.value })}
-            />
-          </div>
+          <SizeSelector
+            selected={selectedSizes}
+            onChange={setSelectedSizes}
+            label={locale === "ar" ? "المقاسات" : "Sizes"}
+          />
           <div>
             <label className="label-text">Colors</label>
             <input

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { SizeSelector } from "@/components/admin/SizeSelector";
 
 export default function AdminProductFormPage() {
   const { locale } = useLanguage();
@@ -20,7 +21,7 @@ export default function AdminProductFormPage() {
     category_id: "",
     sku: "",
     stock: "",
-    sizes: "S,M,L,XL",
+    sizes: ["S", "M", "L", "XL"],
     colors: "أسود,أبيض",
     images: "",
     is_new: false,
@@ -49,7 +50,7 @@ export default function AdminProductFormPage() {
           sale_price: form.sale_price ? parseFloat(form.sale_price) : null,
           category_id: form.category_id ? parseInt(form.category_id) : null,
           stock: parseInt(form.stock) || 0,
-          sizes: JSON.stringify(form.sizes.split(",").map((s) => s.trim())),
+          sizes: JSON.stringify(form.sizes),
           colors: JSON.stringify(form.colors.split(",").map((c) => c.trim())),
           images: JSON.stringify([...imageUrls, ...form.images.split("\n").filter((u) => u.trim())]),
           is_new: form.is_new ? 1 : 0,
@@ -189,16 +190,11 @@ export default function AdminProductFormPage() {
           <h2 className="font-semibold text-charcoal-700">
             {locale === "ar" ? "المقاسات والألوان" : "Sizes & Colors"}
           </h2>
-          <div>
-            <label className="label-text">
-              {locale === "ar" ? "المقاسات" : "Sizes"} (comma separated)
-            </label>
-            <input
-              className="input-field"
-              value={form.sizes}
-              onChange={(e) => setForm({ ...form, sizes: e.target.value })}
-            />
-          </div>
+          <SizeSelector
+            selected={form.sizes}
+            onChange={(sizes) => setForm({ ...form, sizes })}
+            label={locale === "ar" ? "المقاسات" : "Sizes"}
+          />
           <div>
             <label className="label-text">
               {locale === "ar" ? "الألوان" : "Colors"} (comma separated)
