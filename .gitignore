@@ -3,4 +3,7 @@ node_modules/
 data/*.db
 .env.local
 .env*.local
+.env.vercel
+.env.vercel-prod
+next-env.d.ts
 .vercel
