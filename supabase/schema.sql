@@ -2,7 +2,7 @@
 -- Run this in the Supabase SQL Editor
 
 -- Categories
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
   id BIGSERIAL PRIMARY KEY,
   name_en TEXT NOT NULL,
   name_ar TEXT NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE categories (
 );
 
 -- Products
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   id BIGSERIAL PRIMARY KEY,
   name_en TEXT NOT NULL,
   name_ar TEXT NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE products (
 );
 
 -- Users
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE users (
 );
 
 -- Addresses
-CREATE TABLE addresses (
+CREATE TABLE IF NOT EXISTS addresses (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   governorate TEXT,
@@ -70,7 +70,7 @@ CREATE TABLE addresses (
 );
 
 -- Orders
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
   id BIGSERIAL PRIMARY KEY,
   order_number TEXT UNIQUE NOT NULL,
   user_id BIGINT REFERENCES users(id),
@@ -96,7 +96,7 @@ CREATE TABLE orders (
 );
 
 -- Order Items
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
   id BIGSERIAL PRIMARY KEY,
   order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   product_id BIGINT NOT NULL REFERENCES products(id),
@@ -110,7 +110,7 @@ CREATE TABLE order_items (
 );
 
 -- Reviews
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
   id BIGSERIAL PRIMARY KEY,
   product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   user_id BIGINT REFERENCES users(id),
@@ -122,7 +122,7 @@ CREATE TABLE reviews (
 );
 
 -- Wishlist
-CREATE TABLE wishlist (
+CREATE TABLE IF NOT EXISTS wishlist (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
   session_id TEXT,
@@ -131,7 +131,7 @@ CREATE TABLE wishlist (
 );
 
 -- Discount Codes
-CREATE TABLE discount_codes (
+CREATE TABLE IF NOT EXISTS discount_codes (
   id BIGSERIAL PRIMARY KEY,
   code TEXT UNIQUE NOT NULL,
   type TEXT NOT NULL,
@@ -145,20 +145,20 @@ CREATE TABLE discount_codes (
 );
 
 -- Settings
-CREATE TABLE settings (
+CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Indexes
-CREATE INDEX idx_products_slug ON products(slug);
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_products_active ON products(is_active);
-CREATE INDEX idx_orders_user ON orders(user_id);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_order_items_order ON order_items(order_id);
-CREATE INDEX idx_reviews_product ON reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_active ON products(is_active);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(product_id);
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
@@ -173,26 +173,43 @@ ALTER TABLE discount_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 
 -- Public read policies for storefront tables
+DROP POLICY IF EXISTS "Public can read categories" ON categories;
 CREATE POLICY "Public can read categories" ON categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can read active products" ON products;
 CREATE POLICY "Public can read active products" ON products FOR SELECT USING (is_active = true);
+
+DROP POLICY IF EXISTS "Public can read approved reviews" ON reviews;
 CREATE POLICY "Public can read approved reviews" ON reviews FOR SELECT USING (is_approved = true);
+
+DROP POLICY IF EXISTS "Public can read active discounts" ON discount_codes;
 CREATE POLICY "Public can read active discounts" ON discount_codes FOR SELECT USING (is_active = true);
 
 -- Authenticated user policies
+DROP POLICY IF EXISTS "Users can read own profile" ON users;
 CREATE POLICY "Users can read own profile" ON users FOR SELECT USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Users can read own orders" ON orders;
 CREATE POLICY "Users can read own orders" ON orders FOR SELECT USING (auth.uid()::text = user_id::text);
+
+DROP POLICY IF EXISTS "Users can read own order_items" ON order_items;
 CREATE POLICY "Users can read own order_items" ON order_items FOR SELECT USING (
   order_id IN (SELECT id FROM orders WHERE auth.uid()::text = user_id::text)
 );
+
+DROP POLICY IF EXISTS "Users can manage own wishlist" ON wishlist;
 CREATE POLICY "Users can manage own wishlist" ON wishlist FOR ALL USING (auth.uid()::text = user_id::text);
+
+DROP POLICY IF EXISTS "Users can manage own addresses" ON addresses;
 CREATE POLICY "Users can manage own addresses" ON addresses FOR ALL USING (auth.uid()::text = user_id::text);
+
+DROP POLICY IF EXISTS "Users can insert reviews" ON reviews;
 CREATE POLICY "Users can insert reviews" ON reviews FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can read own reviews" ON reviews;
 CREATE POLICY "Users can read own reviews" ON reviews FOR SELECT USING (auth.uid()::text = user_id::text);
 
--- Service role policies (admin - uses service_role key which bypasses RLS)
--- No additional policies needed as service_role bypasses RLS
-
--- Seed data
+-- Seed data (skip if already exists)
 INSERT INTO categories (name_en, name_ar, slug, image, description_en, description_ar, sort_order) VALUES
 ('Dresses', 'فساتين', 'dresses', '/images/cat-dresses.jpg', 'Elegant dresses for every occasion', 'فساتين أنيقة لكل المناسبات', 1),
 ('Tops', 'بلوزات', 'tops', '/images/cat-tops.jpg', 'Stylish tops and blouses', 'بلوزات وتيشيرتات أنيقة', 2),
@@ -201,7 +218,8 @@ INSERT INTO categories (name_en, name_ar, slug, image, description_en, descripti
 ('Outerwear', 'عبايات', 'outerwear', '/images/cat-outerwear.jpg', 'Jackets, abayas and more', 'جاكيتات وعبايات والمزيد', 5),
 ('Accessories', 'إكسسوارات', 'accessories', '/images/cat-accessories.jpg', 'Complete your look', 'أكملي إطلالتك', 6),
 ('New Arrivals', 'وصل حديثاً', 'new-arrivals', '/images/cat-new.jpg', 'Fresh picks just for you', 'أحدث الإصدارات', 7),
-('Sale', 'تخفيضات', 'sale', '/images/cat-sale.jpg', 'Great deals you don''t want to miss', 'عروض لا تفوتيها', 8);
+('Sale', 'تخفيضات', 'sale', '/images/cat-sale.jpg', 'Great deals you don''t want to miss', 'عروض لا تفوتيها', 8)
+ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO products (name_en, name_ar, slug, description_en, description_ar, price, sale_price, category_id, sku, stock, images, sizes, colors, is_new, is_bestseller, rating, review_count, tags) VALUES
 ('Elegant Maxi Dress', 'فستان ماكسي أنيق', 'elegant-maxi-dress', 'A beautiful flowy maxi dress perfect for special occasions', 'فستان ماكسي جميل ومنسدل مثالي للمناسبات الخاصة', 1299, 999, 1, 'HS-DR-001', 25, '["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80","https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&q=80"]', '["S","M","L","XL"]', '["أسود","أبيض","بيج"]', true, true, 4.8, 24, '["new","bestseller"]'),
@@ -215,10 +233,13 @@ INSERT INTO products (name_en, name_ar, slug, description_en, description_ar, pr
 ('High Waist Skinny Jeans', 'جينز سكيني عالي الخصر', 'high-waist-skinny-jeans', 'Stretch skinny jeans with perfect fit', 'جينز سكيني قابل للتمدد بمقاس مثالي', 599, 499, 3, 'HS-PT-002', 40, '["https://images.unsplash.com/photo-1434389677669-e08b4cda3a00?w=800&q=80","https://images.unsplash.com/photo-1509557965875-b88c97052f0e?w=800&q=80"]', '["XS","S","M","L","XL"]', '["أزرق","أسود","أزرق فاتح"]', false, true, 4.5, 35, '["bestseller","sale"]'),
 ('Pearl Drop Earrings', 'أقراط لؤلؤ متدلية', 'pearl-drop-earrings', 'Elegant pearl drop earrings for a sophisticated look', 'أقراط لؤلؤ أنيقة لإطلالة راقية', 349, NULL, 6, 'HS-ACC-001', 50, '["https://images.unsplash.com/photo-1585487000160-e5f8e53a7fbe?w=800&q=80","https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=800&q=80"]', '["One Size"]', '["ذهبي","فضي"]', true, false, 4.7, 20, '["new"]'),
 ('Pleated Maxi Skirt', 'تنورة ماكسي مجعدة', 'pleated-maxi-skirt', 'Flowy pleated maxi skirt for elegant occasions', 'تنورة ماكسي مجعدة منسدلة للمناسبات الأنيقة', 749, 599, 3, 'HS-PT-003', 16, '["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80","https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&q=80"]', '["S","M","L"]', '["بيج","أسود","كحلي"]', true, false, 4.4, 11, '["new","sale"]'),
-('Structured Blazer', 'بليزر مفصل', 'structured-blazer', 'Professional structured blazer for a polished look', 'بليزر مهني مفصل لإطلالة أنيقة', 1399, NULL, 5, 'HS-OUT-003', 10, '["https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=80","https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?w=800&q=80"]', '["S","M","L","XL"]', '["أسود","كحلي","بيج"]', false, true, 4.8, 19, '["bestseller"]');
+('Structured Blazer', 'بليزر مفصل', 'structured-blazer', 'Professional structured blazer for a polished look', 'بليزر مهني مفصل لإطلالة أنيقة', 1399, NULL, 5, 'HS-OUT-003', 10, '["https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=80","https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?w=800&q=80"]', '["S","M","L","XL"]', '["أسود","كحلي","بيج"]', false, true, 4.8, 19, '["bestseller"]')
+ON CONFLICT (slug) DO NOTHING;
 
 -- Admin user (password: admin123)
-INSERT INTO users (name, email, password, role) VALUES ('Admin', 'admin@hamsstyle.com', '$2a$10$Qza/nx2ABv6L5y6m6hQgF.ChTsjG7Hfz2VG3DDwqIhXv808.Zi8dG', 'admin');
+INSERT INTO users (name, email, password, role) VALUES ('Admin', 'admin@hamsstyle.com', '$2a$10$Qza/nx2ABv6L5y6m6hQgF.ChTsjG7Hfz2VG3DDwqIhXv808.Zi8dG', 'admin')
+ON CONFLICT (email) DO NOTHING;
 
 -- Discount code
-INSERT INTO discount_codes (code, type, value, min_order, max_uses, is_active) VALUES ('WELCOME10', 'percentage', 10, 300, 100, true);
+INSERT INTO discount_codes (code, type, value, min_order, max_uses, is_active) VALUES ('WELCOME10', 'percentage', 10, 300, 100, true)
+ON CONFLICT (code) DO NOTHING;

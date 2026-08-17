@@ -10,9 +10,7 @@
     --color-border: #F5E6D3;
     --color-text: #3D3D3D;
     --color-text-secondary: #7A7A7A;
-    --font-inter: "Inter", system-ui, sans-serif;
-    --font-playfair: "Playfair Display", system-ui, serif;
-    --font-noto-arabic: "Noto Sans Arabic", system-ui, sans-serif;
+    --font-cairo: "Cairo", system-ui, sans-serif;
   }
 
   * {

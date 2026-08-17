@@ -9,7 +9,6 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { PromoBanner } from "@/components/home/PromoBanner";
 import { WhyUs } from "@/components/home/WhyUs";
 import { InstagramSection } from "@/components/home/InstagramSection";
-import { ReviewsSection } from "@/components/home/ReviewsSection";
 
 export default function HomePage() {
   const { locale } = useLanguage();
@@ -53,7 +52,6 @@ export default function HomePage() {
       )}
 
       <WhyUs />
-      <ReviewsSection />
       <InstagramSection />
     </>
   );

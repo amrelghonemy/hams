@@ -1,11 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display, Noto_Sans_Arabic } from "next/font/google";
+import { Cairo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
-const notoArabic = Noto_Sans_Arabic({ subsets: ["arabic"], variable: "--font-noto-arabic" });
+const cairo = Cairo({ subsets: ["arabic", "latin"], variable: "--font-cairo", weight: ["300", "400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: {
@@ -47,7 +45,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ar" dir="rtl" className="scroll-smooth" suppressHydrationWarning>
-      <body className={`${inter.variable} ${playfair.variable} ${notoArabic.variable} font-sans antialiased bg-warm-white text-charcoal-700 min-h-screen`}>
+      <body className={`${cairo.variable} font-sans antialiased bg-warm-white text-charcoal-700 min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>

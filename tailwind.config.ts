@@ -59,8 +59,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "var(--font-noto-arabic)", "system-ui", "sans-serif"],
-        display: ["var(--font-playfair)", "var(--font-noto-arabic)", "system-ui", "serif"],
+        sans: ["var(--font-cairo)", "system-ui", "sans-serif"],
+        display: ["var(--font-cairo)", "system-ui", "sans-serif"],
       },
       borderRadius: {
         "4xl": "2rem",
