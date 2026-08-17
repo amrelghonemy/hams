@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { verifyAdmin, unauthorized } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const user = await verifyAdmin();
+  if (!user) return unauthorized();
   try {
     const { data: orders } = await supabaseAdmin
       .from("orders")
@@ -18,6 +21,8 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const user = await verifyAdmin();
+  if (!user) return unauthorized();
   try {
     const { id, status } = await request.json();
 

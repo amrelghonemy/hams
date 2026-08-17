@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setChecking(false);
       return;
     }
-    fetch("/api/admin/stats")
+    fetch("/api/admin/auth")
       .then((r) => {
         if (r.ok) {
           setAuthorized(true);

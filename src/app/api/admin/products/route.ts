@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { verifyAdmin, unauthorized } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const user = await verifyAdmin();
+  if (!user) return unauthorized();
   try {
     const { data: products } = await supabaseAdmin
       .from("products")
@@ -17,6 +20,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await verifyAdmin();
+  if (!user) return unauthorized();
   try {
     const body = await request.json();
     const {
@@ -65,6 +70,8 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const user = await verifyAdmin();
+  if (!user) return unauthorized();
   try {
     const body = await request.json();
     const { id, ...updates } = body;
@@ -85,6 +92,8 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const user = await verifyAdmin();
+  if (!user) return unauthorized();
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
