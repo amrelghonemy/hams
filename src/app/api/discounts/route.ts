@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +13,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Code required" }, { status: 400 });
     }
 
-    const discount = db.prepare(
-      "SELECT * FROM discount_codes WHERE code = ? AND is_active = 1"
-    ).get(code) as any;
+    const { data: discount } = await supabase
+      .from("discount_codes")
+      .select("*")
+      .eq("code", code)
+      .eq("is_active", true)
+      .single();
 
     if (!discount) {
       return NextResponse.json({ error: "Invalid code" }, { status: 404 });

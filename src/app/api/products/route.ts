@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -11,74 +11,63 @@ export async function GET(request: Request) {
     const sort = searchParams.get("sort") || "newest";
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
-    const sizes = searchParams.get("sizes");
-    const colors = searchParams.get("colors");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
-    let query = "SELECT * FROM products WHERE is_active = 1";
-    const params: any[] = [];
+    let query = supabase.from("products").select("*", { count: "exact" }).eq("is_active", true);
 
     if (category) {
-      query += " AND category_id = (SELECT id FROM categories WHERE slug = ?)";
-      params.push(category);
+      const { data: cat } = await supabase.from("categories").select("id").eq("slug", category).single();
+      if (cat) {
+        query = query.eq("category_id", cat.id);
+      }
     }
 
     if (search) {
-      query += " AND (name_en LIKE ? OR name_ar LIKE ? OR tags LIKE ?)";
-      const searchPattern = `%${search}%`;
-      params.push(searchPattern, searchPattern, searchPattern);
+      query = query.or(`name_en.ilike.%${search}%,name_ar.ilike.%${search}%,tags.cs.{${search}}`);
     }
 
     if (minPrice) {
-      query += " AND (sale_price IS NOT NULL AND sale_price >= ? OR (sale_price IS NULL AND price >= ?))";
-      params.push(parseFloat(minPrice), parseFloat(minPrice));
+      const mp = parseFloat(minPrice);
+      query = query.or(`and(sale_price.is.not.null,sale_price.gte.${mp}),and(sale_price.is.null,price.gte.${mp})`);
     }
 
     if (maxPrice) {
-      query += " AND (sale_price IS NOT NULL AND sale_price <= ? OR (sale_price IS NULL AND price <= ?))";
-      params.push(parseFloat(maxPrice), parseFloat(maxPrice));
+      const mp = parseFloat(maxPrice);
+      query = query.or(`and(sale_price.is.not.null,sale_price.lte.${mp}),and(sale_price.is.null,price.lte.${mp})`);
     }
 
-    // Sort
     switch (sort) {
       case "price_asc":
-        query += " ORDER BY COALESCE(sale_price, price) ASC";
+        query = query.order("price", { ascending: true });
         break;
       case "price_desc":
-        query += " ORDER BY COALESCE(sale_price, price) DESC";
-        break;
-      case "newest":
-        query += " ORDER BY created_at DESC";
+        query = query.order("price", { ascending: false });
         break;
       case "top_rated":
-        query += " ORDER BY rating DESC, review_count DESC";
+        query = query.order("rating", { ascending: false });
         break;
       case "bestseller":
-        query += " ORDER BY is_bestseller DESC, review_count DESC";
+        query = query.order("is_bestseller", { ascending: false });
         break;
       default:
-        query += " ORDER BY created_at DESC";
+        query = query.order("created_at", { ascending: false });
     }
 
-    // Count total
-    const countQuery = query.replace("SELECT *", "SELECT COUNT(*) as total");
-    const countResult = db.prepare(countQuery).get(...params) as any;
-    const total = countResult?.total || 0;
+    const offset = (page - 1) * limit;
+    query = query.range(offset, offset + limit - 1);
 
-    // Pagination
-    query += " LIMIT ? OFFSET ?";
-    params.push(limit, (page - 1) * limit);
+    const { data: products, count, error } = await query;
 
-    const products = db.prepare(query).all(...params);
+    if (error) throw error;
 
     return NextResponse.json({
-      products,
+      products: products || [],
       pagination: {
         page,
         limit,
-        total,
-        totalPages: Math.ceil(total / limit),
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit),
       },
     });
   } catch (error) {

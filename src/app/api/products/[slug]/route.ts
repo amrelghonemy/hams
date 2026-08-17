@@ -1,42 +1,43 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
   try {
-    const { searchParams } = new URL(request.url);
-    const slug = searchParams.get("slug");
+    const { slug } = await params;
 
-    if (!slug) {
-      return NextResponse.json({ error: "Slug is required" }, { status: 400 });
-    }
+    const { data: product, error } = await supabase
+      .from("products")
+      .select("*, category:categories(name_en, name_ar, slug)")
+      .eq("slug", slug)
+      .eq("is_active", true)
+      .single();
 
-    const product = db.prepare(`
-      SELECT p.*, c.name_en as category_name_en, c.name_ar as category_name_ar, c.slug as category_slug
-      FROM products p
-      LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.is_active = 1
-    `).get(slug);
-
-    if (!product) {
+    if (error || !product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Get related products
-    const related = db.prepare(`
-      SELECT * FROM products
-      WHERE category_id = ? AND id != ? AND is_active = 1
-      ORDER BY RANDOM() LIMIT 4
-    `).all((product as any).category_id, (product as any).id);
+    const { data: related } = await supabase
+      .from("products")
+      .select("*")
+      .eq("category_id", product.category_id)
+      .eq("is_active", true)
+      .neq("id", product.id)
+      .limit(4);
 
-    // Get reviews
-    const reviews = db.prepare(`
-      SELECT * FROM reviews WHERE product_id = ? AND is_approved = 1
-      ORDER BY created_at DESC LIMIT 10
-    `).all((product as any).id);
+    const { data: reviews } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("product_id", product.id)
+      .eq("is_approved", true)
+      .order("created_at", { ascending: false })
+      .limit(10);
 
-    return NextResponse.json({ product, related, reviews });
+    return NextResponse.json({ product, related: related || [], reviews: reviews || [] });
   } catch (error) {
     console.error("Error fetching product:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

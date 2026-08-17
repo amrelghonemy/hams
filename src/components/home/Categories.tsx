@@ -49,7 +49,7 @@ export function FeaturedCategories() {
   const { locale } = useLanguage();
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#fdf6f3] to-white">
       <div className="container-custom">
         <div className="text-center mb-10 md:mb-14">
           <h2 className="section-title">{t(locale, "featuredCategories")}</h2>
@@ -59,7 +59,7 @@ export function FeaturedCategories() {
             <Link
               key={cat.slug}
               href={`/shop?category=${cat.slug}`}
-              className="group relative aspect-[3/4] overflow-hidden bg-charcoal-50"
+              className="group relative aspect-[3/4] overflow-hidden rounded-3xl shadow-md shadow-[#d4a5a5]/10 hover:shadow-xl hover:shadow-[#c97b7b]/15 transition-all duration-500"
             >
               <Image
                 src={cat.image}
@@ -68,17 +68,17 @@ export function FeaturedCategories() {
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 768px) 50vw, 33vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 inset-x-0 p-4 md:p-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                <h3 className="text-white font-display text-lg md:text-xl mb-1">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#5c3a3a]/60 via-[#8c6262]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+              <div className="absolute bottom-0 inset-x-0 p-4 md:p-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400">
+                <h3 className="text-white font-display text-lg md:text-xl mb-1 drop-shadow-md">
                   {locale === "ar" ? cat.name_ar : cat.name_en}
                 </h3>
-                <span className="text-white/70 text-xs tracking-wider uppercase">
+                <span className="text-[#fae8e4]/80 text-xs tracking-wider uppercase">
                   {t(locale, "shopNow")}
                 </span>
               </div>
               <div className="absolute bottom-4 inset-x-0 text-center group-hover:opacity-0 transition-opacity">
-                <h3 className="text-charcoal-900 font-display text-base md:text-lg bg-white/80 backdrop-blur-sm inline-block px-4 py-1.5">
+                <h3 className="text-[#5c3a3a] font-display text-base md:text-lg bg-white/85 backdrop-blur-sm inline-block px-5 py-2 rounded-full shadow-sm">
                   {locale === "ar" ? cat.name_ar : cat.name_en}
                 </h3>
               </div>

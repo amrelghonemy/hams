@@ -22,9 +22,17 @@ export function ProductSection({ title, products, viewAllHref = "/shop" }: Produ
       <div className="container-custom">
         <div className="flex items-center justify-between mb-8 md:mb-10">
           <h2 className="section-title">{title}</h2>
-          <Link href={viewAllHref} className="text-sm font-medium text-charcoal-500 hover:text-charcoal-900 transition-colors flex items-center gap-1 group">
+          <Link
+            href={viewAllHref}
+            className="text-sm font-medium text-[#c97b7b] hover:text-[#a85c5c] transition-colors flex items-center gap-1 group"
+          >
             {t(locale, "viewAll")}
-            <svg className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="w-4 h-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
           </Link>

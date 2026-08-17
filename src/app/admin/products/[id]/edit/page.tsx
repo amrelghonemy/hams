@@ -47,33 +47,114 @@ export default function AdminProductEditPage() {
         }),
       });
       router.push("/admin/products");
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
     setSaving(false);
   };
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="max-w-2xl space-y-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-3xl shadow-soft p-6 animate-pulse">
+            <div className="skeleton-title w-40 mb-4" />
+            <div className="space-y-3">
+              <div className="skeleton-text" />
+              <div className="skeleton-text w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-display mb-6">{locale === "ar" ? "تعديل المنتج" : "Edit Product"}</h1>
+      <h1 className="text-2xl font-display text-charcoal-700 mb-8">
+        {locale === "ar" ? "تعديل المنتج" : "Edit Product"}
+      </h1>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white p-6 space-y-4">
+        <div className="bg-white rounded-3xl shadow-soft p-6 space-y-5">
           <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className="label-text">Name (EN)</label><input className="input-field" value={form.name_en || ""} onChange={(e) => setForm({ ...form, name_en: e.target.value })} /></div>
-            <div><label className="label-text">الاسم (AR)</label><input className="input-field" value={form.name_ar || ""} onChange={(e) => setForm({ ...form, name_ar: e.target.value })} /></div>
+            <div>
+              <label className="label-text">Name (EN)</label>
+              <input
+                className="input-field"
+                value={form.name_en || ""}
+                onChange={(e) => setForm({ ...form, name_en: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label-text">الاسم (AR)</label>
+              <input
+                className="input-field"
+                value={form.name_ar || ""}
+                onChange={(e) => setForm({ ...form, name_ar: e.target.value })}
+              />
+            </div>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
-            <div><label className="label-text">Price</label><input type="number" className="input-field" value={form.price || ""} onChange={(e) => setForm({ ...form, price: e.target.value })} /></div>
-            <div><label className="label-text">Sale Price</label><input type="number" className="input-field" value={form.sale_price || ""} onChange={(e) => setForm({ ...form, sale_price: e.target.value })} /></div>
-            <div><label className="label-text">Stock</label><input type="number" className="input-field" value={form.stock || ""} onChange={(e) => setForm({ ...form, stock: e.target.value })} /></div>
+            <div>
+              <label className="label-text">Price</label>
+              <input
+                type="number"
+                className="input-field"
+                value={form.price || ""}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label-text">Sale Price</label>
+              <input
+                type="number"
+                className="input-field"
+                value={form.sale_price || ""}
+                onChange={(e) => setForm({ ...form, sale_price: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label-text">Stock</label>
+              <input
+                type="number"
+                className="input-field"
+                value={form.stock || ""}
+                onChange={(e) => setForm({ ...form, stock: e.target.value })}
+              />
+            </div>
           </div>
-          <div><label className="label-text">Sizes</label><input className="input-field" value={form.sizes || ""} onChange={(e) => setForm({ ...form, sizes: e.target.value })} /></div>
-          <div><label className="label-text">Colors</label><input className="input-field" value={form.colors || ""} onChange={(e) => setForm({ ...form, colors: e.target.value })} /></div>
-          <div><label className="label-text">Images (URLs, one per line)</label><textarea className="input-field h-32 font-mono text-xs" value={form.images || ""} onChange={(e) => setForm({ ...form, images: e.target.value })} /></div>
+          <div>
+            <label className="label-text">Sizes</label>
+            <input
+              className="input-field"
+              value={form.sizes || ""}
+              onChange={(e) => setForm({ ...form, sizes: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="label-text">Colors</label>
+            <input
+              className="input-field"
+              value={form.colors || ""}
+              onChange={(e) => setForm({ ...form, colors: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="label-text">Images (URLs, one per line)</label>
+            <textarea
+              className="input-field h-32 font-mono text-xs resize-none"
+              value={form.images || ""}
+              onChange={(e) => setForm({ ...form, images: e.target.value })}
+            />
+          </div>
         </div>
         <div className="flex gap-3">
-          <button type="submit" className="btn-primary" disabled={saving}>{saving ? "..." : (locale === "ar" ? "حفظ التعديلات" : "Save Changes")}</button>
-          <button type="button" onClick={() => router.back()} className="btn-ghost">{locale === "ar" ? "إلغاء" : "Cancel"}</button>
+          <button type="submit" className="btn-primary" disabled={saving}>
+            {saving ? "..." : locale === "ar" ? "حفظ التعديلات" : "Save Changes"}
+          </button>
+          <button type="button" onClick={() => router.back()} className="btn-ghost">
+            {locale === "ar" ? "إلغاء" : "Cancel"}
+          </button>
         </div>
       </form>
     </div>

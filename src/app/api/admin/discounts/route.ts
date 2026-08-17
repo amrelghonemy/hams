@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const discounts = db.prepare("SELECT * FROM discount_codes ORDER BY created_at DESC").all();
-    return NextResponse.json({ discounts });
+    const { data: discounts } = await supabaseAdmin
+      .from("discount_codes")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    return NextResponse.json({ discounts: discounts || [] });
   } catch (error) {
     return NextResponse.json({ discounts: [] });
   }
@@ -17,16 +21,64 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { code, type, value, min_order, max_uses, expires_at } = body;
 
-    const result = db.prepare(`
-      INSERT INTO discount_codes (code, type, value, min_order, max_uses, expires_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(code, type, value, min_order || 0, max_uses || null, expires_at || null);
+    const { data, error } = await supabaseAdmin
+      .from("discount_codes")
+      .insert({
+        code,
+        type,
+        value,
+        min_order: min_order || 0,
+        max_uses: max_uses || null,
+        expires_at: expires_at || null,
+        used_count: 0,
+        is_active: true,
+      })
+      .select()
+      .single();
 
-    return NextResponse.json({
-      success: true,
-      discount: { id: result.lastInsertRowid, code, type, value, used_count: 0, is_active: 1 },
-    });
+    if (error) throw error;
+
+    return NextResponse.json({ success: true, discount: data });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, ...updates } = body;
+
+    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    const { error } = await supabaseAdmin
+      .from("discount_codes")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    const { error } = await supabaseAdmin
+      .from("discount_codes")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

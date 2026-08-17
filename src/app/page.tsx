@@ -34,7 +34,6 @@ export default function HomePage() {
       <Hero />
       <FeaturedCategories />
 
-      {/* New Arrivals */}
       {!loading && newArrivals.length > 0 && (
         <ProductSection
           title={t(locale, "newArrivals")}
@@ -45,7 +44,6 @@ export default function HomePage() {
 
       <PromoBanner />
 
-      {/* Best Sellers */}
       {!loading && bestSellers.length > 0 && (
         <ProductSection
           title={t(locale, "bestSellers")}

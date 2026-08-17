@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
@@ -12,20 +12,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Name, email and password are required" }, { status: 400 });
     }
 
-    const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+    const { data: existing } = await supabaseAdmin
+      .from("users")
+      .select("id")
+      .eq("email", email)
+      .single();
+
     if (existing) {
       return NextResponse.json({ error: "Email already exists" }, { status: 409 });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    const result = db.prepare(
-      "INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)"
-    ).run(name, email, hashedPassword, phone || null);
+    const { data: user, error } = await supabaseAdmin
+      .from("users")
+      .insert({
+        name,
+        email,
+        password: hashedPassword,
+        phone: phone || null,
+        role: "customer",
+      })
+      .select("id, name, email, role")
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      user: { id: result.lastInsertRowid, name, email, role: "customer" },
+      user,
     });
   } catch (error) {
     console.error("Register error:", error);

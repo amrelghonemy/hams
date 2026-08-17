@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
 import { generateOrderNumber } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -28,23 +28,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Calculate totals
     let subtotal = 0;
     const orderItems = [];
 
     for (const item of items) {
-      const product = db.prepare("SELECT * FROM products WHERE id = ?").get(item.product_id) as any;
+      const { data: product } = await supabaseAdmin
+        .from("products")
+        .select("*")
+        .eq("id", item.product_id)
+        .single();
+
       if (!product) continue;
 
       const price = product.sale_price || product.price;
       const itemTotal = price * item.quantity;
       subtotal += itemTotal;
 
+      const images = Array.isArray(product.images) ? product.images : [];
+
       orderItems.push({
         product_id: product.id,
         product_name_en: product.name_en,
         product_name_ar: product.name_ar,
-        product_image: JSON.parse(product.images || "[]")[0] || "",
+        product_image: images[0] || "",
         size: item.size || "",
         color: item.color || "",
         quantity: item.quantity,
@@ -52,12 +58,14 @@ export async function POST(request: Request) {
       });
     }
 
-    // Apply discount
     let discount_amount = 0;
     if (discount_code) {
-      const discount = db.prepare(
-        "SELECT * FROM discount_codes WHERE code = ? AND is_active = 1"
-      ).get(discount_code) as any;
+      const { data: discount } = await supabaseAdmin
+        .from("discount_codes")
+        .select("*")
+        .eq("code", discount_code)
+        .eq("is_active", true)
+        .single();
 
       if (discount) {
         if (discount.type === "percentage") {
@@ -65,7 +73,10 @@ export async function POST(request: Request) {
         } else {
           discount_amount = Math.min(discount.value, subtotal);
         }
-        db.prepare("UPDATE discount_codes SET used_count = used_count + 1 WHERE id = ?").run(discount.id);
+        await supabaseAdmin
+          .from("discount_codes")
+          .update({ used_count: discount.used_count + 1 })
+          .eq("id", discount.id);
       }
     }
 
@@ -73,42 +84,64 @@ export async function POST(request: Request) {
     const total = subtotal - discount_amount + shipping_cost;
     const order_number = generateOrderNumber();
 
-    // Create order
-    const result = db.prepare(`
-      INSERT INTO orders (order_number, customer_name, customer_email, customer_phone,
-        governorate, city, area, street, building, apartment, address_notes,
-        subtotal, shipping_cost, discount_amount, total, payment_method, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      order_number, customer_name, customer_email || "", customer_phone,
-      governorate, city, area, street, building, apartment, address_notes,
-      subtotal, shipping_cost, discount_amount, total, payment_method || "cod", notes
-    );
+    const { data: order, error: orderError } = await supabaseAdmin
+      .from("orders")
+      .insert({
+        order_number,
+        customer_name,
+        customer_email: customer_email || "",
+        customer_phone,
+        governorate,
+        city,
+        area,
+        street,
+        building,
+        apartment,
+        address_notes,
+        subtotal,
+        shipping_cost,
+        discount_amount,
+        total,
+        payment_method: payment_method || "cod",
+        notes,
+      })
+      .select()
+      .single();
 
-    const orderId = result.lastInsertRowid;
+    if (orderError) throw orderError;
 
-    // Create order items
-    const insertItem = db.prepare(`
-      INSERT INTO order_items (order_id, product_id, product_name_en, product_name_ar,
-        product_image, size, color, quantity, price)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    const orderItemsToInsert = orderItems.map((item) => ({
+      order_id: order.id,
+      ...item,
+    }));
+
+    if (orderItemsToInsert.length > 0) {
+      const { error: itemsError } = await supabaseAdmin
+        .from("order_items")
+        .insert(orderItemsToInsert);
+
+      if (itemsError) throw itemsError;
+    }
 
     for (const item of orderItems) {
-      insertItem.run(
-        orderId, item.product_id, item.product_name_en, item.product_name_ar,
-        item.product_image, item.size, item.color, item.quantity, item.price
-      );
+      const { data: prod } = await supabaseAdmin
+        .from("products")
+        .select("stock")
+        .eq("id", item.product_id)
+        .single();
 
-      // Update stock
-      db.prepare("UPDATE products SET stock = stock - ? WHERE id = ?")
-        .run(item.quantity, item.product_id);
+      if (prod) {
+        await supabaseAdmin
+          .from("products")
+          .update({ stock: prod.stock - item.quantity })
+          .eq("id", item.product_id);
+      }
     }
 
     return NextResponse.json({
       success: true,
       order: {
-        id: orderId,
+        id: order.id,
         order_number,
         total,
       },
@@ -126,16 +159,23 @@ export async function GET(request: Request) {
     const phone = searchParams.get("phone");
 
     if (orderNumber && phone) {
-      const order = db.prepare(`
-        SELECT * FROM orders WHERE order_number = ? AND customer_phone = ?
-      `).get(orderNumber, phone);
+      const { data: order, error } = await supabaseAdmin
+        .from("orders")
+        .select("*")
+        .eq("order_number", orderNumber)
+        .eq("customer_phone", phone)
+        .single();
 
-      if (!order) {
+      if (error || !order) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
-      const items = db.prepare("SELECT * FROM order_items WHERE order_id = ?").get((order as any).id);
-      return NextResponse.json({ order, items: [items] });
+      const { data: items } = await supabaseAdmin
+        .from("order_items")
+        .select("*")
+        .eq("order_id", order.id);
+
+      return NextResponse.json({ order, items: items || [] });
     }
 
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });

@@ -26,6 +26,7 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [activeTab, setActiveTab] = useState<"description" | "reviews">("description");
 
   useEffect(() => {
     fetch(`/api/products/${params.slug}`)
@@ -49,12 +50,12 @@ export default function ProductPage() {
     return (
       <div className="container-custom py-8">
         <div className="grid md:grid-cols-2 gap-8 animate-pulse">
-          <div className="skeleton aspect-[3/4]" />
+          <div className="skeleton aspect-[3/4] rounded-3xl" />
           <div className="space-y-4 py-8">
-            <div className="skeleton h-8 w-3/4" />
-            <div className="skeleton h-4 w-1/4" />
-            <div className="skeleton h-6 w-1/3" />
-            <div className="skeleton h-20 w-full" />
+            <div className="skeleton h-8 w-3/4 rounded-2xl" />
+            <div className="skeleton h-4 w-1/4 rounded-xl" />
+            <div className="skeleton h-6 w-1/3 rounded-xl" />
+            <div className="skeleton h-20 w-full rounded-2xl" />
           </div>
         </div>
       </div>
@@ -64,8 +65,10 @@ export default function ProductPage() {
   if (!product) {
     return (
       <div className="container-custom py-20 text-center">
-        <p className="text-charcoal-500 mb-4">{locale === "ar" ? "المنتج غير موجود" : "Product not found"}</p>
-        <Link href="/shop" className="btn-primary">{t(locale, "shopNow")}</Link>
+        <div className="bg-white rounded-3xl shadow-soft p-12 max-w-md mx-auto">
+          <p className="text-charcoal-500 mb-4">{locale === "ar" ? "المنتج غير موجود" : "Product not found"}</p>
+          <Link href="/shop" className="btn-primary">{t(locale, "shopNow")}</Link>
+        </div>
       </div>
     );
   }
@@ -101,27 +104,25 @@ export default function ProductPage() {
 
   return (
     <div className="container-custom py-8 md:py-12">
-      {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-charcoal-400 mb-8">
-        <Link href="/" className="hover:text-charcoal-900">{t(locale, "home")}</Link>
-        <span>/</span>
-        <Link href="/shop" className="hover:text-charcoal-900">{t(locale, "shop")}</Link>
+        <Link href="/" className="hover:text-blush-400 transition-colors">{t(locale, "home")}</Link>
+        <span className="text-cream-400">/</span>
+        <Link href="/shop" className="hover:text-blush-400 transition-colors">{t(locale, "shop")}</Link>
         {product.category_name_en && (
           <>
-            <span>/</span>
-            <Link href={`/shop?category=${product.category_slug}`} className="hover:text-charcoal-900">
+            <span className="text-cream-400">/</span>
+            <Link href={`/shop?category=${product.category_slug}`} className="hover:text-blush-400 transition-colors">
               {locale === "ar" ? product.category_name_ar : product.category_name_en}
             </Link>
           </>
         )}
-        <span>/</span>
-        <span className="text-charcoal-700">{name}</span>
+        <span className="text-cream-400">/</span>
+        <span className="text-blush-400 font-medium">{name}</span>
       </nav>
 
       <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-        {/* Images Gallery */}
         <div>
-          <div className="relative aspect-[3/4] bg-charcoal-50 mb-4 overflow-hidden">
+          <div className="relative aspect-[3/4] bg-cream-200 mb-4 overflow-hidden rounded-3xl shadow-soft-md">
             <Image
               src={images[selectedImage] || "https://placehold.co/600x800/f3ede8/5d453d?text=Hams+Style"}
               alt={name}
@@ -135,13 +136,15 @@ export default function ProductPage() {
             )}
           </div>
           {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto custom-scrollbar">
+            <div className="flex gap-3 overflow-x-auto custom-scrollbar">
               {images.map((img: string, i: number) => (
                 <button
                   key={i}
                   onClick={() => setSelectedImage(i)}
-                  className={`relative w-20 h-24 shrink-0 bg-charcoal-50 overflow-hidden ${
-                    selectedImage === i ? "ring-2 ring-charcoal-900" : "opacity-60 hover:opacity-100"
+                  className={`relative w-20 h-24 shrink-0 rounded-2xl overflow-hidden transition-all duration-300 ${
+                    selectedImage === i
+                      ? "ring-2 ring-blush-400 ring-offset-2 ring-offset-warm-white shadow-soft"
+                      : "opacity-60 hover:opacity-100 border border-cream-300"
                   }`}
                 >
                   <Image src={img} alt="" fill className="object-cover" sizes="80px" />
@@ -151,17 +154,15 @@ export default function ProductPage() {
           )}
         </div>
 
-        {/* Product Info */}
         <div className="md:py-4">
-          <h1 className="text-2xl md:text-3xl font-display text-charcoal-900 mb-2">{name}</h1>
+          <h1 className="text-2xl md:text-3xl font-display text-blush-400 mb-2">{name}</h1>
 
-          {/* Rating */}
           <div className="flex items-center gap-2 mb-4">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <svg
                   key={i}
-                  className={`w-4 h-4 ${i < Math.round(product.rating) ? "text-amber-400" : "text-charcoal-200"}`}
+                  className={`w-4 h-4 ${i < Math.round(product.rating) ? "text-peach-300" : "text-cream-300"}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -169,14 +170,13 @@ export default function ProductPage() {
                 </svg>
               ))}
             </div>
-            <span className="text-sm text-charcoal-500">
+            <span className="text-sm text-charcoal-400">
               {product.rating} ({product.review_count} {t(locale, "reviews")})
             </span>
           </div>
 
-          {/* Price */}
           <div className="flex items-baseline gap-3 mb-6">
-            <span className={`text-2xl font-semibold ${discount > 0 ? "text-red-500" : "text-charcoal-900"}`}>
+            <span className={`text-2xl font-semibold ${discount > 0 ? "text-blush-400" : "text-blush-400"}`}>
               {formatPrice(product.sale_price || product.price, locale)}
             </span>
             {discount > 0 && (
@@ -184,33 +184,31 @@ export default function ProductPage() {
                 <span className="text-lg text-charcoal-400 line-through">
                   {formatPrice(product.price, locale)}
                 </span>
-                <span className="text-sm font-medium text-red-500 bg-red-50 px-2 py-0.5">
+                <span className="text-sm font-medium text-blush-400 bg-rose-100 px-3 py-0.5 rounded-full">
                   -{discount}%
                 </span>
               </>
             )}
           </div>
 
-          {/* Description */}
-          <p className="text-sm text-charcoal-600 leading-relaxed mb-6">
+          <p className="text-sm text-charcoal-500 leading-relaxed mb-6">
             {locale === "ar" ? product.description_ar : product.description_en}
           </p>
 
-          {/* Colors */}
           {colors.length > 0 && (
             <div className="mb-6">
               <label className="label-text">
-                {locale === "ar" ? "اللون" : "Color"}: <span className="font-normal normal-case">{selectedColor}</span>
+                {locale === "ar" ? "اللون" : "Color"}: <span className="font-normal normal-case text-blush-400">{selectedColor}</span>
               </label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {colors.map((color: string) => (
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 text-sm border transition-colors ${
+                    className={`px-5 py-2.5 text-sm rounded-full transition-all duration-300 ${
                       selectedColor === color
-                        ? "border-charcoal-900 bg-charcoal-900 text-white"
-                        : "border-charcoal-200 hover:border-charcoal-400"
+                        ? "bg-blush-400 text-white shadow-soft-md"
+                        : "bg-white text-charcoal-600 border border-cream-300 hover:border-blush-300 hover:text-blush-400 shadow-sm"
                     }`}
                   >
                     {color}
@@ -220,24 +218,25 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Sizes */}
           {sizes.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center justify-between">
                 <label className="label-text">
-                  {locale === "ar" ? "المقاس" : "Size"}: <span className="font-normal normal-case">{selectedSize}</span>
+                  {locale === "ar" ? "المقاس" : "Size"}: <span className="font-normal normal-case text-blush-400">{selectedSize}</span>
                 </label>
-                <button className="text-xs text-charcoal-500 underline">{t(locale, "sizeGuide")}</button>
+                <button className="text-xs text-charcoal-400 underline hover:text-blush-400 transition-colors">
+                  {t(locale, "sizeGuide")}
+                </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {sizes.map((size: string) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-10 text-sm border transition-colors ${
+                    className={`w-12 h-10 text-sm rounded-full transition-all duration-300 ${
                       selectedSize === size
-                        ? "border-charcoal-900 bg-charcoal-900 text-white"
-                        : "border-charcoal-200 hover:border-charcoal-400"
+                        ? "bg-blush-400 text-white shadow-soft-md"
+                        : "bg-white text-charcoal-600 border border-cream-300 hover:border-blush-300 hover:text-blush-400 shadow-sm"
                     }`}
                   >
                     {size}
@@ -247,45 +246,44 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Quantity */}
           <div className="mb-6">
             <label className="label-text">{t(locale, "quantity")}</label>
-            <div className="flex items-center border border-charcoal-200 w-fit mt-2">
+            <div className="flex items-center border border-cream-300 w-fit mt-2 rounded-full overflow-hidden shadow-sm">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 flex items-center justify-center text-lg hover:bg-charcoal-50"
+                className="w-10 h-10 flex items-center justify-center text-lg text-charcoal-400 hover:bg-rose-100 hover:text-blush-400 transition-colors"
               >
                 −
               </button>
-              <span className="w-12 h-10 flex items-center justify-center text-sm font-medium border-x border-charcoal-200">
+              <span className="w-12 h-10 flex items-center justify-center text-sm font-medium text-blush-400">
                 {quantity}
               </span>
               <button
                 onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                className="w-10 h-10 flex items-center justify-center text-lg hover:bg-charcoal-50"
+                className="w-10 h-10 flex items-center justify-center text-lg text-charcoal-400 hover:bg-rose-100 hover:text-blush-400 transition-colors"
               >
                 +
               </button>
             </div>
           </div>
 
-          {/* Stock */}
-          <p className={`text-sm mb-6 ${product.stock > 0 ? "text-green-600" : "text-red-500"}`}>
+          <p className={`text-sm mb-6 font-medium ${product.stock > 0 ? "text-green-500" : "text-blush-300"}`}>
             {product.stock > 0 ? t(locale, "inStock") : t(locale, "outOfStock")}
           </p>
 
-          {/* Action Buttons */}
           <div className="flex gap-3 mb-6">
-            <button onClick={handleAddToCart} className="btn-primary flex-1" disabled={product.stock === 0}>
+            <button onClick={handleAddToCart} className="btn-primary flex-1 rounded-full" disabled={product.stock === 0}>
               {addedToCart ? "✓ Added!" : t(locale, "addToCart")}
             </button>
-            <button onClick={handleBuyNow} className="btn-secondary flex-1" disabled={product.stock === 0}>
+            <button onClick={handleBuyNow} className="btn-secondary flex-1 rounded-full" disabled={product.stock === 0}>
               {t(locale, "buyNow")}
             </button>
             <button
               onClick={() => toggleItem(product.id)}
-              className={`w-12 h-12 flex items-center justify-center border transition-colors ${
-                inWishlist ? "bg-red-50 border-red-200 text-red-500" : "border-charcoal-200 hover:border-charcoal-400"
+              className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 ${
+                inWishlist
+                  ? "bg-rose-100 border-2 border-rose-200 text-blush-300 shadow-soft"
+                  : "bg-white border-2 border-cream-300 text-charcoal-400 hover:border-rose-200 hover:text-blush-300 shadow-sm"
               }`}
             >
               <svg className="w-5 h-5" fill={inWishlist ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
@@ -294,28 +292,94 @@ export default function ProductPage() {
             </button>
           </div>
 
-          {/* Info */}
-          <div className="space-y-3 border-t pt-6">
-            <div className="flex items-center gap-3 text-sm text-charcoal-600">
-              <svg className="w-5 h-5 text-charcoal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21a.75.75 0 0 0 .75-.75V11.25a3 3 0 0 0-3-3h-1.5l-1.72-4.575A1.5 1.5 0 0 0 13.093 2.25H10.907a1.5 1.5 0 0 0-1.432 1.025L7.75 7.875H3.375a3 3 0 0 0-3 3v5.25c0 .621.504 1.125 1.125 1.125h12.75" />
-              </svg>
+          <div className="space-y-3 border-t border-cream-300 pt-6">
+            <div className="flex items-center gap-3 text-sm text-charcoal-500">
+              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                <svg className="w-4 h-4 text-blush-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21a.75.75 0 0 0 .75-.75V11.25a3 3 0 0 0-3-3h-1.5l-1.72-4.575A1.5 1.5 0 0 0 13.093 2.25H10.907a1.5 1.5 0 0 0-1.432 1.025L7.75 7.875H3.375a3 3 0 0 0-3 3v5.25c0 .621.504 1.125 1.125 1.125h12.75" />
+                </svg>
+              </div>
               {t(locale, "estimatedDelivery")}: 2-5 {locale === "ar" ? " أيام عمل" : "business days"}
             </div>
-            <div className="flex items-center gap-3 text-sm text-charcoal-600">
-              <svg className="w-5 h-5 text-charcoal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-              </svg>
+            <div className="flex items-center gap-3 text-sm text-charcoal-500">
+              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                <svg className="w-4 h-4 text-blush-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+              </div>
               {t(locale, "easyReturns")}
+            </div>
+          </div>
+
+          <div className="mt-6 bg-white rounded-2xl shadow-soft overflow-hidden">
+            <div className="flex border-b border-cream-300">
+              <button
+                onClick={() => setActiveTab("description")}
+                className={`flex-1 py-3 text-sm font-medium transition-all duration-300 ${
+                  activeTab === "description"
+                    ? "text-blush-400 border-b-2 border-blush-400"
+                    : "text-charcoal-400 hover:text-blush-300"
+                }`}
+              >
+                {t(locale, "description")}
+              </button>
+              <button
+                onClick={() => setActiveTab("reviews")}
+                className={`flex-1 py-3 text-sm font-medium transition-all duration-300 ${
+                  activeTab === "reviews"
+                    ? "text-blush-400 border-b-2 border-blush-400"
+                    : "text-charcoal-400 hover:text-blush-300"
+                }`}
+              >
+                {t(locale, "reviews")} ({reviews.length})
+              </button>
+            </div>
+            <div className="p-5">
+              {activeTab === "description" ? (
+                <p className="text-sm text-charcoal-500 leading-relaxed">
+                  {locale === "ar" ? product.description_ar : product.description_en}
+                </p>
+              ) : reviews.length === 0 ? (
+                <p className="text-sm text-charcoal-400 text-center py-4">
+                  {locale === "ar" ? "لا توجد مراجعات بعد" : "No reviews yet"}
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review: any) => (
+                    <div key={review.id} className="bg-cream-100 rounded-2xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-blush-400">
+                            {review.customer_name?.charAt(0) || "?"}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-charcoal-700">{review.customer_name}</span>
+                        <div className="flex items-center ml-auto">
+                          {[...Array(5)].map((_, i) => (
+                            <svg
+                              key={i}
+                              className={`w-3 h-3 ${i < review.rating ? "text-peach-300" : "text-cream-300"}`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm text-charcoal-500">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Related Products */}
       {related.length > 0 && (
         <section className="mt-16">
-          <h2 className="section-title mb-8">{t(locale, "relatedProducts")}</h2>
+          <h2 className="section-title mb-8 text-blush-400">{t(locale, "relatedProducts")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {related.map((p: any) => (
               <ProductCard key={p.id} product={p} />

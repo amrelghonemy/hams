@@ -64,59 +64,68 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/product/${product.slug}`} className="product-card">
-      {/* Image */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-charcoal-50">
+    <Link href={`/product/${product.slug}`} className="group block">
+      <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-blush-50 shadow-[0_4px_20px_rgba(219,166,166,0.15)] hover:shadow-[0_8px_32px_rgba(219,166,166,0.25)] transition-shadow duration-500">
         <Image
           src={imageUrl}
           alt={name}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Badges */}
-        {product.is_new === 1 && <span className="badge-new">{t(locale, "new")}</span>}
-        {discount > 0 && <span className="badge-sale">-{discount}%</span>}
+        {product.is_new === 1 && (
+          <span className="absolute top-3 left-3 z-10 px-3 py-1 text-[10px] font-semibold tracking-wide uppercase rounded-full bg-rose-400 text-white shadow-sm">
+            {t(locale, "new")}
+          </span>
+        )}
+        {discount > 0 && (
+          <span className="absolute top-3 right-3 z-10 px-3 py-1 text-[10px] font-semibold tracking-wide uppercase rounded-full bg-blush-400 text-white shadow-sm">
+            -{discount}%
+          </span>
+        )}
         {product.is_bestseller === 1 && !product.is_new && discount === 0 && (
-          <span className="badge-bestseller">{locale === "ar" ? "الأكثر مبيعاً" : "Bestseller"}</span>
+          <span className="absolute top-3 left-3 z-10 px-3 py-1 text-[10px] font-semibold tracking-wide uppercase rounded-full bg-mauve-400 text-white shadow-sm">
+            {locale === "ar" ? "الأكثر مبيعاً" : "Bestseller"}
+          </span>
         )}
 
-        {/* Hover Actions */}
-        <div className="absolute inset-x-0 bottom-0 p-3 flex items-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+
+        <div className="absolute inset-x-0 bottom-0 p-4 flex items-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out">
           <button
             onClick={handleQuickAdd}
-            className="flex-1 bg-white/95 backdrop-blur-sm text-charcoal-900 text-xs font-medium py-2.5 hover:bg-charcoal-900 hover:text-white transition-colors"
+            className="flex-1 bg-white/95 backdrop-blur-sm text-rose-700 text-xs font-semibold py-2.5 rounded-full hover:bg-rose-400 hover:text-white transition-all duration-300 shadow-md"
           >
             {t(locale, "addToCart")}
           </button>
           <button
             onClick={handleWishlist}
-            className={`w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm transition-colors ${
-              inWishlist ? "text-red-500" : "text-charcoal-600 hover:text-red-500"
+            className={`w-10 h-10 flex items-center justify-center rounded-full bg-white/95 backdrop-blur-sm shadow-md transition-all duration-300 ${
+              inWishlist
+                ? "text-rose-500 hover:bg-rose-50"
+                : "text-charcoal-400 hover:text-rose-500 hover:bg-rose-50"
             }`}
           >
-            <svg className="w-4 h-4" fill={inWishlist ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            <svg className="w-4 h-4" fill={inWishlist ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Info */}
-      <div className="p-3">
-        <h3 className="text-sm font-medium text-charcoal-800 line-clamp-1 group-hover:text-charcoal-950 transition-colors">
+      <div className="pt-3 px-1">
+        <h3 className="text-sm font-medium text-charcoal-800 line-clamp-1 group-hover:text-rose-600 transition-colors duration-300">
           {name}
         </h3>
 
-        {/* Rating */}
         {product.rating > 0 && (
-          <div className="flex items-center gap-1 mt-1">
-            <div className="flex items-center">
+          <div className="flex items-center gap-1 mt-1.5">
+            <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <svg
                   key={i}
-                  className={`w-3 h-3 ${i < Math.round(product.rating) ? "text-amber-400" : "text-charcoal-200"}`}
+                  className={`w-3 h-3 ${i < Math.round(product.rating) ? "text-amber-400" : "text-blush-200"}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -128,9 +137,8 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Price */}
         <div className="flex items-center gap-2 mt-1.5">
-          <span className={`text-sm font-semibold ${discount > 0 ? "text-red-500" : ""}`}>
+          <span className={`text-sm font-semibold ${discount > 0 ? "text-blush-500" : "text-charcoal-900"}`}>
             {formatPrice(product.sale_price || product.price, locale)}
           </span>
           {discount > 0 && (
@@ -140,11 +148,15 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Colors */}
         {colors.length > 0 && (
-          <div className="flex items-center gap-1 mt-2">
+          <div className="flex items-center gap-1.5 mt-2.5">
             {colors.slice(0, 4).map((color: string, i: number) => (
-              <span key={i} className="w-3 h-3 rounded-full border border-charcoal-200" title={color} />
+              <span
+                key={i}
+                className="w-3.5 h-3.5 rounded-full border-2 border-white shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
+                style={{ backgroundColor: color }}
+                title={color}
+              />
             ))}
             {colors.length > 4 && (
               <span className="text-[10px] text-charcoal-400">+{colors.length - 4}</span>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -15,7 +15,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as any;
+    const { data: user } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
     if (!user) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }

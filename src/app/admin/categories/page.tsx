@@ -8,12 +8,21 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name_en: "", name_ar: "", slug: "", description_en: "", description_ar: "" });
+  const [form, setForm] = useState({
+    name_en: "",
+    name_ar: "",
+    slug: "",
+    description_en: "",
+    description_ar: "",
+  });
 
   useEffect(() => {
     fetch("/api/admin/categories")
       .then((r) => r.json())
-      .then((data) => { setCategories(data.categories || []); setLoading(false); })
+      .then((data) => {
+        setCategories(data.categories || []);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -34,46 +43,103 @@ export default function AdminCategoriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-display">{locale === "ar" ? "الأقسام" : "Categories"}</h1>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary text-sm">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-display text-charcoal-700">
+          {locale === "ar" ? "الأقسام" : "Categories"}
+        </h1>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="btn-primary text-sm"
+        >
           + {locale === "ar" ? "إضافة قسم" : "Add Category"}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 mb-6 space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl shadow-soft p-6 mb-6 space-y-5"
+        >
           <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className="label-text">Name (EN) *</label><input required className="input-field" value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} /></div>
-            <div><label className="label-text">الاسم (AR) *</label><input required className="input-field" value={form.name_ar} onChange={(e) => setForm({ ...form, name_ar: e.target.value })} /></div>
+            <div>
+              <label className="label-text">Name (EN) *</label>
+              <input
+                required
+                className="input-field"
+                value={form.name_en}
+                onChange={(e) => setForm({ ...form, name_en: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label-text">الاسم (AR) *</label>
+              <input
+                required
+                className="input-field"
+                value={form.name_ar}
+                onChange={(e) => setForm({ ...form, name_ar: e.target.value })}
+              />
+            </div>
           </div>
-          <div><label className="label-text">Slug</label><input className="input-field" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} /></div>
+          <div>
+            <label className="label-text">Slug</label>
+            <input
+              className="input-field"
+              value={form.slug}
+              onChange={(e) => setForm({ ...form, slug: e.target.value })}
+            />
+          </div>
           <div className="flex gap-3">
-            <button type="submit" className="btn-primary text-sm">{locale === "ar" ? "حفظ" : "Save"}</button>
-            <button type="button" onClick={() => setShowForm(false)} className="btn-ghost text-sm">{locale === "ar" ? "إلغاء" : "Cancel"}</button>
+            <button type="submit" className="btn-primary text-sm">
+              {locale === "ar" ? "حفظ" : "Save"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="btn-ghost text-sm"
+            >
+              {locale === "ar" ? "إلغاء" : "Cancel"}
+            </button>
           </div>
         </form>
       )}
 
-      <div className="bg-white overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-charcoal-50">
-              <th className="text-start p-3 font-medium">EN</th>
-              <th className="text-start p-3 font-medium">AR</th>
-              <th className="text-start p-3 font-medium">Slug</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((c: any) => (
-              <tr key={c.id} className="border-b hover:bg-charcoal-50">
-                <td className="p-3">{c.name_en}</td>
-                <td className="p-3">{c.name_ar}</td>
-                <td className="p-3 text-charcoal-400 font-mono text-xs">{c.slug}</td>
+      <div className="bg-white rounded-3xl shadow-soft overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-cream-200 bg-cream-100/50">
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  EN
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  AR
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  Slug
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {categories.map((c: any) => (
+                <tr
+                  key={c.id}
+                  className="border-b border-cream-200/50 hover:bg-cream-100/30 transition-colors"
+                >
+                  <td className="p-4 font-medium text-charcoal-700">{c.name_en}</td>
+                  <td className="p-4 text-charcoal-500">{c.name_ar}</td>
+                  <td className="p-4 text-charcoal-400 font-mono text-xs">{c.slug}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {categories.length === 0 && !loading && (
+          <div className="p-12 text-center">
+            <p className="text-charcoal-400">
+              {locale === "ar" ? "لا توجد أقسام" : "No categories"}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

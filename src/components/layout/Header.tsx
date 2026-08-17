@@ -40,7 +40,9 @@ export function Header() {
     } else {
       document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenuOpen]);
 
   const handleSearch = useCallback(
@@ -58,115 +60,157 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-30 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white"
+        className={`sticky top-0 z-30 transition-all duration-500 ease-out ${
+          scrolled
+            ? "bg-cream-50/95 backdrop-blur-md shadow-[0_8px_32px_rgba(244,114,182,0.08)]"
+            : "bg-cream-50"
         }`}
       >
-        {/* Top Bar */}
-        <div className="bg-charcoal-900 text-white text-center py-2 text-xs tracking-wider">
-          <p className="container-custom">
-            {locale === "ar" ? "شحن مجاني للطلبات فوق 500 جنيه" : "Free shipping on orders over 500 EGP"}
+        <div className="bg-gradient-to-r from-rose-100/80 via-blush-100/60 to-rose-100/80 text-center py-2.5 text-xs tracking-wider">
+          <p className="container-custom text-rose-500 font-medium">
+            {locale === "ar"
+              ? "شحن مجاني للطلبات فوق 500 جنيه"
+              : "Free shipping on orders over 500 EGP"}
           </p>
         </div>
 
-        {/* Main Header */}
         <div className="container-custom">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 -me-2"
+              className="md:hidden p-2.5 -me-2 rounded-2xl hover:bg-rose-50 transition-colors duration-300"
               aria-label="Open menu"
             >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              <svg
+                className="w-6 h-6 text-charcoal-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
               </svg>
             </button>
 
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-xl md:text-2xl font-display font-bold tracking-tight text-charcoal-900">
+            <Link href="/" className="flex items-center gap-1.5 group">
+              <span className="text-xl md:text-2xl font-display font-bold tracking-tight text-charcoal-800 transition-colors duration-300 group-hover:text-charcoal-900">
                 HAMS
               </span>
-              <span className="text-xl md:text-2xl font-display font-light tracking-tight text-nude-500">
+              <span className="text-xl md:text-2xl font-display font-light tracking-tight text-rose-400 transition-colors duration-300 group-hover:text-rose-500">
                 STYLE
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.key}
                   href={link.href}
-                  className="px-3 py-2 text-sm font-medium text-charcoal-600 hover:text-charcoal-900 transition-colors relative group"
+                  className="px-4 py-2 text-sm font-medium text-charcoal-600 hover:text-rose-600 bg-rose-50/0 hover:bg-rose-50 rounded-full transition-all duration-300 ease-out"
                 >
                   {t(locale, link.key)}
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-charcoal-900 group-hover:w-3/4 transition-all duration-300" />
                 </Link>
               ))}
             </nav>
 
-            {/* Icons */}
             <div className="flex items-center gap-1">
-              {/* Language Switcher */}
               <button
                 onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
-                className="px-2.5 py-1.5 text-xs font-bold border border-charcoal-200 hover:border-charcoal-400 transition-colors"
+                className="px-3.5 py-1.5 text-xs font-bold rounded-full border border-rose-200 text-charcoal-600 hover:border-rose-300 hover:bg-rose-50 transition-all duration-300"
                 aria-label="Switch language"
               >
                 {locale === "ar" ? "EN" : "عربي"}
               </button>
 
-              {/* Search */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 text-charcoal-600 hover:text-charcoal-900 transition-colors"
+                className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300"
                 aria-label="Search"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                  />
                 </svg>
               </button>
 
-              {/* Wishlist */}
               <Link
                 href="/account/wishlist"
-                className="p-2 text-charcoal-600 hover:text-charcoal-900 transition-colors relative hidden sm:flex"
+                className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 relative hidden sm:flex"
                 aria-label="Wishlist"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                  />
                 </svg>
                 {wishlistItems.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-400 text-white text-[9px] font-bold flex items-center justify-center rounded-full shadow-sm">
                     {wishlistItems.length}
                   </span>
                 )}
               </Link>
 
-              {/* Account */}
               <Link
                 href="/account"
-                className="p-2 text-charcoal-600 hover:text-charcoal-900 transition-colors hidden sm:flex"
+                className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 hidden sm:flex"
                 aria-label="Account"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                  />
                 </svg>
               </Link>
 
-              {/* Cart */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="p-2 text-charcoal-600 hover:text-charcoal-900 transition-colors relative"
+                className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 relative"
                 aria-label="Cart"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  />
                 </svg>
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-charcoal-900 text-white text-[9px] font-bold flex items-center justify-center rounded-full">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-400 text-white text-[9px] font-bold flex items-center justify-center rounded-full shadow-sm">
                     {totalItems}
                   </span>
                 )}
@@ -176,23 +220,28 @@ export function Header() {
         </div>
       </header>
 
-      {/* Search Overlay */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center pt-24" onClick={() => setSearchOpen(false)}>
+        <div
+          className="fixed inset-0 z-50 bg-charcoal-900/20 backdrop-blur-sm flex items-start justify-center pt-24 transition-opacity duration-300"
+          onClick={() => setSearchOpen(false)}
+        >
           <div
-            className="bg-white w-full max-w-lg mx-4 p-4 animate-scale-in"
+            className="bg-cream-50/95 backdrop-blur-md w-full max-w-lg mx-4 p-6 rounded-3xl shadow-[0_20px_60px_rgba(244,114,182,0.12)] animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <form onSubmit={handleSearch} className="flex gap-2">
+            <form onSubmit={handleSearch} className="flex gap-3">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t(locale, "searchPlaceholder")}
-                className="input-field flex-1"
+                className="flex-1 px-5 py-3.5 bg-white border border-rose-100 rounded-full text-sm text-charcoal-700 placeholder:text-charcoal-400 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all duration-300"
                 autoFocus
               />
-              <button type="submit" className="btn-primary">
+              <button
+                type="submit"
+                className="px-6 py-3.5 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md"
+              >
                 {t(locale, "search")}
               </button>
             </form>
@@ -200,18 +249,38 @@ export function Header() {
         </div>
       )}
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <>
-          <div className="menu-overlay" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed top-0 start-0 h-full w-80 max-w-[85vw] bg-white z-50 shadow-2xl animate-slide-in-left flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
-              <Link href="/" className="text-lg font-display font-bold text-charcoal-900" onClick={() => setMobileMenuOpen(false)}>
-                HAMS STYLE
+          <div
+            className="menu-overlay"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="fixed top-0 start-0 h-full w-80 max-w-[85vw] bg-cream-50 z-50 shadow-[10px_0_40px_rgba(244,114,182,0.1)] animate-slide-in-left flex flex-col rounded-e-[2rem]">
+            <div className="flex items-center justify-between p-6 border-b border-rose-100/60">
+              <Link
+                href="/"
+                className="text-lg font-display"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="font-bold text-charcoal-800">HAMS</span>
+                <span className="font-light text-rose-400"> STYLE</span>
               </Link>
-              <button onClick={() => setMobileMenuOpen(false)} className="p-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18 18 6M6 6l12 12" />
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-2xl hover:bg-rose-50 transition-colors duration-300"
+              >
+                <svg
+                  className="w-5 h-5 text-charcoal-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M6 18 18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -221,34 +290,34 @@ export function Header() {
                   key={link.key}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-6 py-3.5 text-sm font-medium text-charcoal-700 hover:bg-charcoal-50 hover:text-charcoal-900 transition-colors"
+                  className="flex items-center px-6 py-3.5 mx-3 text-sm font-medium text-charcoal-600 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
                 >
                   {t(locale, link.key)}
                 </Link>
               ))}
-              <div className="border-t my-4" />
+              <div className="border-t border-rose-100/60 my-4 mx-6" />
               <Link
                 href="/account"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-6 py-3.5 text-sm font-medium text-charcoal-700 hover:bg-charcoal-50"
+                className="flex items-center px-6 py-3.5 mx-3 text-sm font-medium text-charcoal-600 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
               >
                 {t(locale, "myAccount")}
               </Link>
               <Link
                 href="/account/wishlist"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-6 py-3.5 text-sm font-medium text-charcoal-700 hover:bg-charcoal-50"
+                className="flex items-center px-6 py-3.5 mx-3 text-sm font-medium text-charcoal-600 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
               >
                 {t(locale, "wishlist")}
               </Link>
             </nav>
-            <div className="p-4 border-t">
+            <div className="p-6 border-t border-rose-100/60">
               <button
                 onClick={() => {
                   setLocale(locale === "ar" ? "en" : "ar");
                   setMobileMenuOpen(false);
                 }}
-                className="btn-secondary w-full text-sm"
+                className="w-full px-5 py-2.5 text-sm font-medium rounded-full border border-rose-200 text-charcoal-600 hover:border-rose-300 hover:bg-rose-50 transition-all duration-300"
               >
                 {locale === "ar" ? "English" : "عربي"}
               </button>
@@ -257,7 +326,6 @@ export function Header() {
         </>
       )}
 
-      {/* Cart Drawer */}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );

@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const orders = db.prepare(`
-      SELECT * FROM orders ORDER BY created_at DESC LIMIT 50
-    `).all();
-    return NextResponse.json({ orders });
+    const { data: orders } = await supabaseAdmin
+      .from("orders")
+      .select("*, items:order_items(*)")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    return NextResponse.json({ orders: orders || [] });
   } catch (error) {
     return NextResponse.json({ orders: [] });
   }
@@ -17,7 +20,14 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const { id, status } = await request.json();
-    db.prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(status, id);
+
+    const { error } = await supabaseAdmin
+      .from("orders")
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) throw error;
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: "Failed" }, { status: 500 });

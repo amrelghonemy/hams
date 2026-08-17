@@ -41,19 +41,27 @@ export function ReviewsSection() {
   const { locale } = useLanguage();
 
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#fdf6f3] to-white">
       <div className="container-custom">
         <div className="text-center mb-12">
           <h2 className="section-title">{t(locale, "customerReviews")}</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5">
           {reviews.map((review, i) => (
-            <div key={i} className="bg-[#faf7f5] p-6 text-center">
+            <div
+              key={i}
+              className="bg-white rounded-3xl p-6 text-center shadow-md shadow-[#d4a5a5]/10 hover:shadow-lg hover:shadow-[#c97b7b]/15 transition-all duration-400 hover:-translate-y-1 border border-[#f5e6e0]/60"
+            >
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#f5e6e0] to-[#eeddd6] flex items-center justify-center">
+                <span className="text-[#c97b7b] font-display text-lg font-semibold">
+                  {review.name.charAt(0)}
+                </span>
+              </div>
               <div className="flex items-center justify-center gap-0.5 mb-3">
                 {[...Array(5)].map((_, j) => (
                   <svg
                     key={j}
-                    className={`w-4 h-4 ${j < review.rating ? "text-amber-400" : "text-charcoal-200"}`}
+                    className={`w-4 h-4 ${j < review.rating ? "text-[#d4a576]" : "text-[#f0e4dc]"}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -61,10 +69,12 @@ export function ReviewsSection() {
                   </svg>
                 ))}
               </div>
-              <p className="text-sm text-charcoal-600 leading-relaxed mb-4">
+              <p className="text-sm text-[#8c6262] leading-relaxed mb-4 italic">
                 &ldquo;{locale === "ar" ? review.text : review.textEn}&rdquo;
               </p>
-              <p className="text-xs font-medium text-charcoal-900">{review.name}</p>
+              <p className="text-xs font-semibold text-[#5c3a3a] tracking-wide">
+                {review.name}
+              </p>
             </div>
           ))}
         </div>

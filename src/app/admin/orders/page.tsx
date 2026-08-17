@@ -12,7 +12,10 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     fetch("/api/admin/orders")
       .then((r) => r.json())
-      .then((data) => { setOrders(data.orders || []); setLoading(false); })
+      .then((data) => {
+        setOrders(data.orders || []);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -22,16 +25,16 @@ export default function AdminOrdersPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status }),
     });
-    setOrders(orders.map((o) => o.id === id ? { ...o, status } : o));
+    setOrders(orders.map((o) => (o.id === id ? { ...o, status } : o)));
   };
 
   const statusColors: Record<string, string> = {
-    pending: "bg-yellow-50 text-yellow-700",
-    confirmed: "bg-blue-50 text-blue-700",
-    preparing: "bg-purple-50 text-purple-700",
-    shipped: "bg-indigo-50 text-indigo-700",
-    delivered: "bg-green-50 text-green-700",
-    cancelled: "bg-red-50 text-red-700",
+    pending: "bg-peach-100/60 text-peach-300",
+    confirmed: "bg-mauve-100/60 text-mauve-300",
+    preparing: "bg-rose-100/60 text-blush-400",
+    shipped: "bg-blush-100/60 text-blush-400",
+    delivered: "bg-rose-100/60 text-blush-400",
+    cancelled: "bg-cream-300 text-charcoal-500",
   };
 
   const statusLabels: Record<string, { en: string; ar: string }> = {
@@ -45,51 +48,86 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display mb-6">{locale === "ar" ? "الطلبات" : "Orders"}</h1>
-      <div className="bg-white overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-charcoal-50">
-              <th className="text-start p-3 font-medium">#</th>
-              <th className="text-start p-3 font-medium">{locale === "ar" ? "العميل" : "Customer"}</th>
-              <th className="text-start p-3 font-medium">{locale === "ar" ? "الإجمالي" : "Total"}</th>
-              <th className="text-start p-3 font-medium">{locale === "ar" ? "الحالة" : "Status"}</th>
-              <th className="text-start p-3 font-medium">{locale === "ar" ? "التاريخ" : "Date"}</th>
-              <th className="text-start p-3 font-medium">{locale === "ar" ? "إجراءات" : "Actions"}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((o) => (
-              <tr key={o.id} className="border-b hover:bg-charcoal-50">
-                <td className="p-3 font-mono text-xs">{o.order_number}</td>
-                <td className="p-3">
-                  <p>{o.customer_name}</p>
-                  <p className="text-xs text-charcoal-400">{o.customer_phone}</p>
-                </td>
-                <td className="p-3 font-medium">{formatPrice(o.total, locale)}</td>
-                <td className="p-3">
-                  <select
-                    value={o.status}
-                    onChange={(e) => updateStatus(o.id, e.target.value)}
-                    className={`text-xs px-2 py-1 border-0 font-medium ${statusColors[o.status] || ""}`}
-                  >
-                    {Object.entries(statusLabels).map(([key, val]) => (
-                      <option key={key} value={key}>{locale === "ar" ? val.ar : val.en}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="p-3 text-xs text-charcoal-400">
-                  {new Date(o.created_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US")}
-                </td>
-                <td className="p-3">
-                  <span className="text-xs text-charcoal-400">{o.payment_method === "cod" ? "COD" : "Card"}</span>
-                </td>
+      <h1 className="text-2xl font-display text-charcoal-700 mb-8">
+        {locale === "ar" ? "الطلبات" : "Orders"}
+      </h1>
+      <div className="bg-white rounded-3xl shadow-soft overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-cream-200 bg-cream-100/50">
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  #
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  {locale === "ar" ? "العميل" : "Customer"}
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  {locale === "ar" ? "الإجمالي" : "Total"}
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  {locale === "ar" ? "الحالة" : "Status"}
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  {locale === "ar" ? "التاريخ" : "Date"}
+                </th>
+                <th className="text-start p-4 font-medium text-charcoal-500 uppercase tracking-wider text-xs">
+                  {locale === "ar" ? "إجراءات" : "Actions"}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((o) => (
+                <tr
+                  key={o.id}
+                  className="border-b border-cream-200/50 hover:bg-cream-100/30 transition-colors"
+                >
+                  <td className="p-4 font-mono text-xs text-charcoal-500">
+                    {o.order_number}
+                  </td>
+                  <td className="p-4">
+                    <p className="font-medium text-charcoal-700">{o.customer_name}</p>
+                    <p className="text-xs text-charcoal-400 mt-0.5">{o.customer_phone}</p>
+                  </td>
+                  <td className="p-4 font-medium text-charcoal-700">
+                    {formatPrice(o.total, locale)}
+                  </td>
+                  <td className="p-4">
+                    <select
+                      value={o.status}
+                      onChange={(e) => updateStatus(o.id, e.target.value)}
+                      className={`text-xs px-3 py-1.5 rounded-full font-medium border-0 cursor-pointer ${
+                        statusColors[o.status] || ""
+                      }`}
+                    >
+                      {Object.entries(statusLabels).map(([key, val]) => (
+                        <option key={key} value={key}>
+                          {locale === "ar" ? val.ar : val.en}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="p-4 text-xs text-charcoal-400">
+                    {new Date(o.created_at).toLocaleDateString(
+                      locale === "ar" ? "ar-EG" : "en-US"
+                    )}
+                  </td>
+                  <td className="p-4">
+                    <span className="text-xs text-charcoal-400 font-medium">
+                      {o.payment_method === "cod" ? "COD" : "Card"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {orders.length === 0 && !loading && (
-          <p className="p-8 text-center text-charcoal-400">{locale === "ar" ? "لا توجد طلبات" : "No orders yet"}</p>
+          <div className="p-12 text-center">
+            <p className="text-charcoal-400">
+              {locale === "ar" ? "لا توجد طلبات" : "No orders yet"}
+            </p>
+          </div>
         )}
       </div>
     </div>
