@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /checkout
+Disallow: /confirmation
 
-Sitemap: https://hamsstyle.com/sitemap.xml
+Sitemap: https://hams-style.vercel.app/sitemap.xml
