@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { t } from "@/lib/i18n";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -21,7 +20,6 @@ const navLinks = [
 export function Header() {
   const { locale, setLocale } = useLanguage();
   const { totalItems } = useCart();
-  const { items: wishlistItems } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -146,51 +144,6 @@ export function Header() {
                 </svg>
               </button>
 
-              <Link
-                href="/account/wishlist"
-                className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 relative hidden sm:flex"
-                aria-label="Wishlist"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-                {wishlistItems.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-400 text-white text-[9px] font-bold flex items-center justify-center rounded-full shadow-sm">
-                    {wishlistItems.length}
-                  </span>
-                )}
-              </Link>
-
-              <Link
-                href="/account"
-                className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 hidden sm:flex"
-                aria-label="Account"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                  />
-                </svg>
-              </Link>
-
               <button
                 onClick={() => setCartOpen(true)}
                 className="p-2.5 rounded-2xl text-charcoal-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 relative"
@@ -296,20 +249,6 @@ export function Header() {
                 </Link>
               ))}
               <div className="border-t border-rose-100/60 my-4 mx-6" />
-              <Link
-                href="/account"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-6 py-3.5 mx-3 text-sm font-medium text-charcoal-600 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
-              >
-                {t(locale, "myAccount")}
-              </Link>
-              <Link
-                href="/account/wishlist"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-6 py-3.5 mx-3 text-sm font-medium text-charcoal-600 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
-              >
-                {t(locale, "wishlist")}
-              </Link>
             </nav>
             <div className="p-6 border-t border-rose-100/60">
               <button
