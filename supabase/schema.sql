@@ -218,7 +218,7 @@ INSERT INTO products (name_en, name_ar, slug, description_en, description_ar, pr
 ('Structured Blazer', 'بليزر مفصل', 'structured-blazer', 'Professional structured blazer for a polished look', 'بليزر مهني مفصل لإطلالة أنيقة', 1399, NULL, 5, 'HS-OUT-003', 10, '["https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=80","https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?w=800&q=80"]', '["S","M","L","XL"]', '["أسود","كحلي","بيج"]', false, true, 4.8, 19, '["bestseller"]');
 
 -- Admin user (password: admin123)
-INSERT INTO users (name, email, password, role) VALUES ('Admin', 'admin@hamsstyle.com', '$2a$10$rQEY5z5X5z5X5z5X5z5X5OeMzYQzYwNjM2MzYwNjM2Mz', 'admin');
+INSERT INTO users (name, email, password, role) VALUES ('Admin', 'admin@hamsstyle.com', '$2a$10$Qza/nx2ABv6L5y6m6hQgF.ChTsjG7Hfz2VG3DDwqIhXv808.Zi8dG', 'admin');
 
 -- Discount code
 INSERT INTO discount_codes (code, type, value, min_order, max_uses, is_active) VALUES ('WELCOME10', 'percentage', 10, 300, 100, true);
