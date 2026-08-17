@@ -32,9 +32,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const { toggleItem, isInWishlist } = useWishlist();
   const { addItem } = useCart();
 
-  const images = JSON.parse(product.images || "[]");
-  const sizes = JSON.parse(product.sizes || "[]");
-  const colors = JSON.parse(product.colors || "[]");
+  const images = Array.isArray(product.images) ? product.images : JSON.parse(product.images || "[]");
+  const sizes = Array.isArray(product.sizes) ? product.sizes : JSON.parse(product.sizes || "[]");
+  const colors = Array.isArray(product.colors) ? product.colors : JSON.parse(product.colors || "[]");
   const discount = product.sale_price ? getDiscountPercentage(product.price, product.sale_price) : 0;
   const inWishlist = isInWishlist(product.id);
   const name = locale === "ar" ? product.name_ar : product.name_en;

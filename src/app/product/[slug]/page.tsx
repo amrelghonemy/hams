@@ -37,8 +37,8 @@ export default function ProductPage() {
         setReviews(data.reviews || []);
         setLoading(false);
         if (data.product) {
-          const sizes = JSON.parse(data.product.sizes || "[]");
-          const colors = JSON.parse(data.product.colors || "[]");
+          const sizes = Array.isArray(data.product.sizes) ? data.product.sizes : JSON.parse(data.product.sizes || "[]");
+          const colors = Array.isArray(data.product.colors) ? data.product.colors : JSON.parse(data.product.colors || "[]");
           if (sizes.length) setSelectedSize(sizes[0]);
           if (colors.length) setSelectedColor(colors[0]);
         }
@@ -73,9 +73,9 @@ export default function ProductPage() {
     );
   }
 
-  const images = JSON.parse(product.images || "[]");
-  const sizes = JSON.parse(product.sizes || "[]");
-  const colors = JSON.parse(product.colors || "[]");
+  const images = Array.isArray(product.images) ? product.images : JSON.parse(product.images || "[]");
+  const sizes = Array.isArray(product.sizes) ? product.sizes : JSON.parse(product.sizes || "[]");
+  const colors = Array.isArray(product.colors) ? product.colors : JSON.parse(product.colors || "[]");
   const discount = product.sale_price ? getDiscountPercentage(product.price, product.sale_price) : 0;
   const name = locale === "ar" ? product.name_ar : product.name_en;
   const inWishlist = isInWishlist(product.id);
