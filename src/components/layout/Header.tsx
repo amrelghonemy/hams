@@ -207,7 +207,7 @@ export function Header() {
             className="menu-overlay"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="fixed top-0 start-0 h-full w-80 max-w-[85vw] bg-cream-50 z-50 shadow-[10px_0_40px_rgba(244,114,182,0.1)] animate-slide-in-left flex flex-col rounded-e-[2rem]">
+          <div className="fixed top-0 start-0 h-full w-80 max-w-[85vw] bg-white/95 backdrop-blur-md z-50 shadow-[10px_0_40px_rgba(244,114,182,0.1)] animate-slide-in-left flex flex-col rounded-e-[2rem]">
             <div className="flex items-center justify-between p-6 border-b border-rose-100/60">
               <Link
                 href="/"
@@ -220,7 +220,7 @@ export function Header() {
                 className="p-2.5 rounded-2xl hover:bg-rose-50 transition-colors duration-300"
               >
                 <svg
-                  className="w-5 h-5 text-charcoal-600"
+                  className="w-5 h-5 text-charcoal-700"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -240,7 +240,7 @@ export function Header() {
                   key={link.key}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-6 py-3.5 mx-3 text-sm font-medium text-charcoal-600 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
+                  className="flex items-center px-6 py-3.5 mx-3 text-sm font-semibold text-charcoal-700 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all duration-300"
                 >
                   {t(locale, link.key)}
                 </Link>
@@ -253,7 +253,7 @@ export function Header() {
                   setLocale(locale === "ar" ? "en" : "ar");
                   setMobileMenuOpen(false);
                 }}
-                className="w-full px-5 py-2.5 text-sm font-medium rounded-full border border-rose-200 text-charcoal-600 hover:border-rose-300 hover:bg-rose-50 transition-all duration-300"
+                className="w-full px-5 py-2.5 text-sm font-semibold rounded-full border border-rose-200 text-charcoal-700 hover:border-rose-300 hover:bg-rose-50 transition-all duration-300"
               >
                 {locale === "ar" ? "English" : "عربي"}
               </button>
