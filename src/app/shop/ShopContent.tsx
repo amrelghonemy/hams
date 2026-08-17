@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAnalytics } from "@/context/AnalyticsContext";
 import { t } from "@/lib/i18n";
 import { ProductCard } from "@/components/product/ProductCard";
 
@@ -10,6 +11,7 @@ export default function ShopContent() {
   const { locale } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { trackSearch } = useAnalytics();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -19,6 +21,7 @@ export default function ShopContent() {
   const currentSort = searchParams.get("sort") || "newest";
   const currentSearch = searchParams.get("search") || "";
   const currentPage = parseInt(searchParams.get("page") || "1");
+  const prevSearchRef = useRef(currentSearch);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -43,6 +46,13 @@ export default function ShopContent() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  useEffect(() => {
+    if (currentSearch && currentSearch !== prevSearchRef.current) {
+      trackSearch(currentSearch);
+      prevSearchRef.current = currentSearch;
+    }
+  }, [currentSearch]);
 
   const updateParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());

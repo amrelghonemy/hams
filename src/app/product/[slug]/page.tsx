@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAnalytics } from "@/context/AnalyticsContext";
 import { t } from "@/lib/i18n";
 import { formatPrice, getDiscountPercentage } from "@/lib/utils";
 import { ProductCard } from "@/components/product/ProductCard";
@@ -17,6 +18,7 @@ export default function ProductPage() {
   const { locale } = useLanguage();
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
+  const { trackViewContent, trackAddToCart } = useAnalytics();
   const [product, setProduct] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -41,6 +43,12 @@ export default function ProductPage() {
           const colors = Array.isArray(data.product.colors) ? data.product.colors : JSON.parse(data.product.colors || "[]");
           if (sizes.length) setSelectedSize(sizes[0]);
           if (colors.length) setSelectedColor(colors[0]);
+          trackViewContent({
+            id: data.product.id,
+            name: data.product.name_en || data.product.name_ar,
+            price: data.product.sale_price || data.product.price,
+            category: data.product.category_name_en || "",
+          });
         }
       })
       .catch(() => setLoading(false));
@@ -92,6 +100,13 @@ export default function ProductPage() {
       color: selectedColor,
       quantity,
       stock: product.stock,
+    });
+    trackAddToCart({
+      id: product.id,
+      name: product.name_en || product.name_ar,
+      price: product.sale_price || product.price,
+      quantity,
+      category: product.category_name_en || "",
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);

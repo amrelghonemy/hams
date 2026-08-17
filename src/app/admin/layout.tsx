@@ -51,6 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/customers", label: locale === "ar" ? "العملاء" : "Customers", icon: "👥" },
     { href: "/admin/categories", label: locale === "ar" ? "الأقسام" : "Categories", icon: "🏷️" },
     { href: "/admin/discounts", label: locale === "ar" ? "الخصومات" : "Discounts", icon: "💰" },
+    { href: "/admin/analytics", label: locale === "ar" ? "التحليلات" : "Analytics", icon: "📈" },
   ];
 
   const isActive = (href: string) => {

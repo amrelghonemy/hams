@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAnalytics } from "@/context/AnalyticsContext";
 import { t } from "@/lib/i18n";
 import { formatPrice } from "@/lib/utils";
 import { governorates } from "@/lib/utils";
@@ -12,9 +13,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, shippingCost, clearCart } = useCart();
   const { locale } = useLanguage();
+  const { trackInitiateCheckout, trackPurchase } = useAnalytics();
   const [loading, setLoading] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [tracked, setTracked] = useState(false);
   const [form, setForm] = useState({
     customer_name: "",
     customer_email: "",
@@ -30,6 +33,21 @@ export default function CheckoutPage() {
   });
 
   const total = subtotal - discountAmount + shippingCost;
+
+  useEffect(() => {
+    if (items.length > 0 && !tracked) {
+      trackInitiateCheckout(
+        items.map((item) => ({
+          id: String(item.productId),
+          name: locale === "ar" ? item.name_ar : item.name_en,
+          price: item.sale_price || item.price,
+          quantity: item.quantity,
+        })),
+        subtotal
+      );
+      setTracked(true);
+    }
+  }, [items, tracked]);
 
   const handleApplyDiscount = async () => {
     if (!discountCode) return;
@@ -67,6 +85,16 @@ export default function CheckoutPage() {
 
       const data = await res.json();
       if (data.success) {
+        trackPurchase(
+          data.order.order_number,
+          items.map((item) => ({
+            id: String(item.productId),
+            name: locale === "ar" ? item.name_ar : item.name_en,
+            price: item.sale_price || item.price,
+            quantity: item.quantity,
+          })),
+          total
+        );
         clearCart();
         router.push(`/confirmation?order=${data.order.order_number}`);
       }
