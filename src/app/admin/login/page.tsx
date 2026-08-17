@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-cream-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo.png" alt="Hams Style" className="h-20 w-auto mx-auto object-contain" />
+          <img src="/logo.png" alt="Hams Style" className="h-60 w-auto mx-auto object-contain" />
           <p className="text-charcoal-400 mt-2 text-sm">
             {locale === "ar" ? "لوحة التحكم" : "Admin Panel"}
           </p>
