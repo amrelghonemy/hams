@@ -67,7 +67,7 @@ export function ContactContent() {
           </h2>
           <div className="space-y-4 text-sm">
             <a
-              href="https://wa.me/201000000000"
+              href="https://wa.me/201027087044"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 bg-rose-50 rounded-2xl hover:bg-rose-100 transition-colors"
@@ -79,7 +79,7 @@ export function ContactContent() {
               </div>
               <div>
                 <p className="font-medium text-charcoal-700">WhatsApp</p>
-                <p className="text-charcoal-400">+20 100 000 0000</p>
+                <p className="text-charcoal-400">+20 102 708 7044</p>
               </div>
             </a>
             <a

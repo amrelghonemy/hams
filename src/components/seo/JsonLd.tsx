@@ -51,7 +51,7 @@ export function OrganizationJsonLd() {
     description: "Premium women's fashion in Egypt. Shop dresses, tops, sets & more.",
     sameAs: [
       "https://www.instagram.com/hamss_tyle",
-      "https://www.facebook.com/share/19HKhpw1Yt/",
+      "https://www.facebook.com/hamsstyleeg",
     ],
     contactPoint: {
       "@type": "ContactPoint",
